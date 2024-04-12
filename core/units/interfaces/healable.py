@@ -3,5 +3,5 @@ from abc import ABC, abstractmethod
 
 class Healable(ABC):
     @abstractmethod
-    def heal(self, hp: int):
+    def heal(self) -> int:
         raise NotImplementedError()
