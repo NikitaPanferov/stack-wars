@@ -1,81 +1,79 @@
-
-
 forces:
-  alliance:
-    archer:
-      hp: 100
-      damage: 30
-      defence: 20
-      dodge: 15
-      cost: 25
-      range: 50
-      heal_percent: 5
-    heavy_swordsman:
-      hp: 150
-      damage: 50
-      defence: 30
-      dodge: 5
-      cost: 40
-      heal_percent: 10
-    light_swordsman:
-      hp: 80
-      damage: 40
-      defence: 25
-      dodge: 20
-      cost: 20
-      heal_percent: 7
-    paladin:
-      hp: 200
-      damage: 60
-      defence: 40
-      dodge: 10
-      cost: 50
-      range: 30
-      heal_percent: 15
-    wizard:
-      hp: 70
-      damage: 80
-      defence: 10
-      dodge: 5
-      cost: 35
-      range: 40
-      heal_percent: 12
-  horde:
-    archer:
-      hp: 90
-      damage: 35
-      defence: 18
-      dodge: 12
-      cost: 22
-      range: 45
-      heal_percent: 6
-    heavy_swordsman:
-      hp: 160
-      damage: 55
-      defence: 35
-      dodge: 3
-      cost: 45
-      heal_percent: 12
-    light_swordsman:
-      hp: 85
-      damage: 45
-      defence: 28
-      dodge: 25
-      cost: 18
-      heal_percent: 9
-    paladin:
-      hp: 210
-      damage: 65
-      defence: 45
-      dodge: 15
-      cost: 55
-      range: 35
-      heal_percent: 18
-    wizard:
-      hp: 75
-      damage: 85
-      defence: 15
-      dodge: 10
-      cost: 38
-      range: 45
-      heal_percent: 13
+    alliance:
+        archer:
+            hp: 100
+            damage: 30
+            defence: 20
+            dodge: 15
+            cost: 25
+            range: 50
+            heal_percent: 5
+        heavy_swordsman:
+            hp: 150
+            damage: 50
+            defence: 30
+            dodge: 5
+            cost: 40
+            heal_percent: 10
+        light_swordsman:
+            hp: 80
+            damage: 40
+            defence: 25
+            dodge: 20
+            cost: 20
+            heal_percent: 7
+        paladin:
+            hp: 200
+            damage: 60
+            defence: 40
+            dodge: 10
+            cost: 50
+            range: 30
+            heal_percent: 15
+        wizard:
+            hp: 70
+            damage: 80
+            defence: 10
+            dodge: 5
+            cost: 35
+            range: 40
+            heal_percent: 12
+    horde:
+        archer:
+            hp: 90
+            damage: 35
+            defence: 18
+            dodge: 12
+            cost: 22
+            range: 45
+            heal_percent: 6
+        heavy_swordsman:
+            hp: 160
+            damage: 55
+            defence: 35
+            dodge: 3
+            cost: 45
+            heal_percent: 12
+        light_swordsman:
+            hp: 85
+            damage: 45
+            defence: 28
+            dodge: 25
+            cost: 18
+            heal_percent: 9
+        paladin:
+            hp: 210
+            damage: 65
+            defence: 45
+            dodge: 15
+            cost: 55
+            range: 35
+            heal_percent: 18
+        wizard:
+            hp: 75
+            damage: 85
+            defence: 15
+            dodge: 10
+            cost: 38
+            range: 45
+            heal_percent: 13

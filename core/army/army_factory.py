@@ -1,25 +1,38 @@
-from abc import ABC, abstractmethod
+from __future__ import annotations
 
+from conf.config import Army, Settings
 from core.units import Archer, HeavySwordsman, LightSwordsman, Paladin, Wizard
 
 
-class ArmyFactory(ABC):
-    @abstractmethod
+class ArmyFactory:
+    def __init__(self, settings: Army):
+        self._archer = Archer(**settings.archer.dict())
+        self._heavy_swordsman = HeavySwordsman(**settings.heavy_swordsman.dict())
+        self._light_swordsman = LightSwordsman(**settings.light_swordsman.dict())
+        self._paladin = Paladin(**settings.paladin.dict())
+        self._wizard = Wizard(**settings.wizard.dict())
+
     def archer(self) -> Archer:
-        raise NotImplementedError()
+        return Archer(self._archer)
 
-    @abstractmethod
     def heavy_swordsman(self) -> HeavySwordsman:
-        raise NotImplementedError()
+        return HeavySwordsman(self._heavy_swordsman)
 
-    @abstractmethod
     def light_swordsman(self) -> LightSwordsman:
-        raise NotImplementedError()
+        return LightSwordsman(self._light_swordsman)
 
-    @abstractmethod
     def paladin(self) -> Paladin:
-        raise NotImplementedError()
+        return Paladin(self._paladin)
 
-    @abstractmethod
     def wizard(self) -> Wizard:
-        raise NotImplementedError()
+        return Wizard(self._wizard)
+
+    @classmethod
+    def factory(cls, army_type: str) -> ArmyFactory:
+        match army_type:
+            case 'horde':
+                return cls(Settings().forces.horde)
+            case 'alliance':
+                return cls(Settings().forces.alliance)
+            case _:
+                raise AttributeError()

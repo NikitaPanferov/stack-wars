@@ -3,7 +3,10 @@ from __future__ import annotations  # для правильной работы �
 import random
 from abc import ABC
 
+from misc.lazy import lazy
 
+
+@lazy
 class Unit(ABC):
     hp: int
     damage: int
@@ -11,15 +14,28 @@ class Unit(ABC):
     dodge: int
     cost: int
 
-    def __init__(self, hp: int, damage: int, defence: int, dodge: int, cost: int):
+    def __init__(self, unit=None, *args, **kwargs):
+        if unit:
+            self.hp = unit.hp
+            self.damage = unit.damage
+            self.defence = unit.defence
+            self.dodge = unit.dodge
+            self.cost = unit.cost
+        else:
+            self._init_stats(*args, **kwargs)
+
+    def _init_stats(self, hp: int, damage: int, defence: int, dodge: int, cost: int, *args, **kwargs):
         self.hp = hp
         self.damage = damage
         self.defence = defence
         self.dodge = dodge
         self.cost = cost
 
-    def attack(self, unit: Unit) -> int:
-        return unit.take_damage(self.damage)
+    def set_hp(self, hp: int):
+        self.hp = hp
+
+    def get_damage(self) -> int:
+        return self.damage
 
     def take_damage(self, damage: int) -> int:
         if random.random() * 100 >= self.dodge:

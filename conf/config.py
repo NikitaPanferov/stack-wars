@@ -73,14 +73,10 @@ class Settings(BaseModel, metaclass=SingletonBaseModelMeta):
         cls(**data)
 
 
-Settings.load_from_yaml('config.yaml')
-
-print(Settings())
-
-Settings.load_from_yaml('config.yaml')
-
-print(Settings())
-
-
-
-
+# Settings.load_from_yaml('config.yaml')
+#
+# print(Settings())
+#
+# Settings.load_from_yaml('config.yaml')
+#
+# print(Settings())
