@@ -56,9 +56,13 @@ class Forces(BaseModel):
     horde: Army
 
 
-class Settings(BaseModel, metaclass=SingletonBaseModelMeta):
+class SettingsBaseModel(BaseModel):
     forces: Forces
+    capital: int
+    line_count: int
 
+
+class Settings(SettingsBaseModel, metaclass=SingletonBaseModelMeta):
     @classmethod
     def load_from_yaml(cls, file_path):
         """ Загружает и применяет конфигурацию из YAML файла. """

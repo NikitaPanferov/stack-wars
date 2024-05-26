@@ -77,3 +77,5 @@ forces:
             cost: 38
             range: 45
             heal_percent: 13
+capital: 500
+line_count: 3
