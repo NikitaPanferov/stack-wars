@@ -9,15 +9,9 @@ def start_up():
     Settings.load_from_yaml('conf/config.yaml')
 
 
-origins = [
-    "http://127.0.0.1",
-    "http://127.0.0.1:8000",
-    "http://localhost",
-    "http://localhost:8000",
-]
-
-
 app = FastAPI(on_startup=[start_up])
+
+origins = ["*"]
 
 app.add_middleware(
     CORSMiddleware,
@@ -26,8 +20,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-
 
 app.include_router(config_router)
 
