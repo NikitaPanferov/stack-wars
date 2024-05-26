@@ -1,4 +1,4 @@
-type UnitConfig = {
+export type UnitConfig = {
     hp: number;
     damage: number;
     defence: number;
