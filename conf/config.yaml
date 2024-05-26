@@ -8,6 +8,7 @@ forces:
             cost: 25
             range: 50
             heal_percent: 5
+            ranged_damage: 60
         heavy_swordsman:
             hp: 150
             damage: 50
@@ -47,6 +48,7 @@ forces:
             cost: 22
             range: 45
             heal_percent: 6
+            ranged_damage: 70
         heavy_swordsman:
             hp: 160
             damage: 55

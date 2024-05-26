@@ -6,13 +6,11 @@ from core.army.army_factory import ArmyFactory
 from schemas import InitArmiesDTO
 
 
-
 class GameManager:
     def __init__(self):
         self.alliance: Army | None = None
         self.horde: Army | None = None
         Settings.load_from_yaml('/Users/nikitapanferov/prog/stack-wars/conf/config.yaml')
-
 
     def start_new_game(self, armies: InitArmiesDTO):
         alliance_factory = ArmyFactory.factory("alliance")

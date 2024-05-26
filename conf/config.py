@@ -15,6 +15,10 @@ class Unit(ABC):
     cost: int
 
 
+class RangedDamageMixin(ABC):
+    ranged_damage: int
+
+
 class RangeMixin(ABC):
     range: int
 
@@ -23,7 +27,7 @@ class HealPercentMixin(ABC):
     heal_percent: int
 
 
-class Archer(Unit, RangeMixin, HealPercentMixin, BaseModel):
+class Archer(Unit, RangeMixin, HealPercentMixin, RangedDamageMixin, BaseModel):
     pass
 
 
