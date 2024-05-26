@@ -10,7 +10,9 @@ import {
   Col,
   Card,
   Collapse,
-  Typography
+  Typography,
+  Spin,
+  Flex,
 } from "antd";
 import { fetchConfig, saveConfig } from "../api";
 
@@ -76,7 +78,11 @@ export const ConfigPage = () => {
   }, [data]);
 
   if (isLoading) {
-    return <div>Loading...</div>;
+    return (
+      <Flex justify="center" align="center">
+        <Spin size="large" />
+      </Flex>
+    );
   }
 
   if (error) {
@@ -84,10 +90,8 @@ export const ConfigPage = () => {
   }
 
   return (
-    <div style={{ padding: "20px" }}>
-      <Typography.Title>
-        Конфигурация
-      </Typography.Title>
+    <Card>
+      <Typography.Title>Конфигурация</Typography.Title>
       {config && (
         <Form layout="vertical">
           <Form.Item label="Capital">
@@ -178,12 +182,12 @@ export const ConfigPage = () => {
           <Button
             type="primary"
             onClick={handleSave}
-            disabled={mutation.isLoading}
+            loading={mutation.isLoading}
           >
             Save Config
           </Button>
         </Form>
       )}
-    </div>
+    </Card>
   );
 };
