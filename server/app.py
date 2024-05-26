@@ -3,6 +3,7 @@ from starlette.middleware.cors import CORSMiddleware
 
 from conf.config import Settings
 from server.routers.config import router as config_router
+from server.routers.game import router as game_router
 
 
 def start_up():
@@ -22,5 +23,4 @@ app.add_middleware(
 )
 
 app.include_router(config_router)
-
-
+app.include_router(game_router)
