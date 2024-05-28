@@ -8,7 +8,9 @@ import {
 
 const { Header, Footer, Content } = Layout;
 
-export const AppLayout: React.FC = ({ children }) => {
+export const AppLayout: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
   return (
     <Layout style={{ minHeight: "100vh" }}>
       <Header
@@ -21,27 +23,27 @@ export const AppLayout: React.FC = ({ children }) => {
             alignItems: "center",
           }}
         >
-          <div>
+          <div style={{width: '100%', display: 'flex', alignItems: 'center', gap: '2rem'}}>
             <Tooltip title="Home">
-              <Button type="text" icon={<HomeOutlined />} href="/" />
+              <Button size="large" type="text" icon={<HomeOutlined />} href="/" />
             </Tooltip>
             <Tooltip title="Config">
-              <Button type="text" icon={<SettingOutlined />} href="/config" />
+              <Button size="large" type="text" icon={<SettingOutlined />} href="/config" />
             </Tooltip>
+            <Tag
+              color="geekblue"
+              style={{
+                fontSize: "2rem",
+                height: "3rem",
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                padding: "0 2rem",
+              }}
+            >
+              STACK WARS
+            </Tag>
           </div>
-          <Tag
-            color="geekblue"
-            style={{
-              fontSize: "2rem",
-              height: "3rem",
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              padding: "0 2rem",
-            }}
-          >
-            STACK WARS
-          </Tag>
           <div />
         </div>
       </Header>
