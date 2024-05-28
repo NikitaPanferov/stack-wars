@@ -1,14 +1,13 @@
-from pydantic import BaseModel, Field
+from typing import List
 
+from pydantic import BaseModel
 
-class ArmyDTO(BaseModel):
-    archer: int = Field(default=0, ge=0)
-    heavy_swordsman: int = Field(default=0, ge=0)
-    light_swordsman: int = Field(default=0, ge=0)
-    paladin: int = Field(default=0, ge=0)
-    wizard: int = Field(default=0, ge=0)
+from schemas.unitDTO import UnitType
 
 
 class InitArmiesDTO(BaseModel):
-    horde: ArmyDTO
-    alliance: ArmyDTO
+    horde: List[UnitType]
+    alliance: List[UnitType]
+
+    class Config:
+        use_enum_values = True

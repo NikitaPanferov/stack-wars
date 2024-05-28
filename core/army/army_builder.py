@@ -33,5 +33,5 @@ class ArmyBuilder:
         self.units.append(self.factory.wizard())
         return self
 
-    def build(self) -> List[Unit]:
-        return self.units
+    def build(self) -> List[List[Unit]]:
+        return [self.units]
