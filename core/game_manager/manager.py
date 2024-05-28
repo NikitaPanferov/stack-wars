@@ -1,16 +1,17 @@
+from typing import AsyncGenerator
 
-from conf.config import Settings
 from core.army.army import Army
 from core.army.army_builder import ArmyBuilder
 from core.army.army_factory import ArmyFactory
+from misc.singleton import SingletonMeta
 from schemas import InitArmiesDTO
+from schemas.unitDTO import UnitDTO
 
 
-class GameManager:
+class GameManager(metaclass=SingletonMeta):
     def __init__(self):
         self.alliance: Army | None = None
         self.horde: Army | None = None
-        Settings.load_from_yaml('/Users/nikitapanferov/prog/stack-wars/conf/config.yaml')
 
     def start_new_game(self, armies: InitArmiesDTO):
         alliance_factory = ArmyFactory.factory("alliance")
@@ -19,5 +20,17 @@ class GameManager:
         alliance_builder = ArmyBuilder(alliance_factory)
         horde_builder = ArmyBuilder(horde_factory)
 
-        self.alliance = Army(alliance_builder, armies.alliance.dict())
-        self.horde = Army(horde_builder, armies.horde.dict())
+        self.alliance = Army(alliance_builder, armies.alliance)
+        self.horde = Army(horde_builder, armies.horde)
+
+        return {
+            'alliance': [[UnitDTO.from_orm(unit) for unit in units] for units in self.alliance.units],
+            'horde': [[UnitDTO.from_orm(unit) for unit in units] for units in self.horde.units]
+        }
+
+
+async def game_manager() -> AsyncGenerator[GameManager, None]:
+    try:
+        yield GameManager()
+    finally:
+        pass

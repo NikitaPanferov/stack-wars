@@ -2,12 +2,14 @@ from __future__ import annotations  # для правильной работы �
 
 import random
 from abc import ABC
+from uuid import uuid4
 
 from misc.lazy import lazy
 
 
 @lazy
 class Unit(ABC):
+    id: str
     hp: int
     damage: int
     defence: int
@@ -15,6 +17,7 @@ class Unit(ABC):
     cost: int
 
     def __init__(self, unit=None, *args, **kwargs):
+        self.id = uuid4().hex
         if unit:
             self.hp = unit.hp
             self.damage = unit.damage

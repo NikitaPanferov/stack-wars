@@ -1,8 +1,9 @@
-from typing import List
+from typing import Annotated
 
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 
 from conf.config import Settings
+from core.game_manager.manager import GameManager, game_manager
 from schemas import InitArmiesDTO
 from schemas.action import Action, ActionType
 from schemas.game_state import GameState
@@ -14,11 +15,8 @@ router = APIRouter(prefix='/game')
 
 
 @router.post('/start')
-async def start_game(armies: InitArmiesDTO) -> GameState:
-    return GameState(
-        alliance=[[UnitDTO(id=i, type=UnitType.archer, **Settings().forces.alliance.archer.dict()) for i in range(5)]],
-        horde=[[UnitDTO(id=i, type=UnitType.archer, **Settings().forces.horde.archer.dict()) for i in range(5, 10)]]
-    )
+async def start_game(armies: InitArmiesDTO, gm: Annotated[GameManager, Depends(game_manager)]) -> GameState:
+    return gm.start_new_game(armies)
 
 
 @router.get('/next_step')
@@ -30,7 +28,6 @@ async def next_step() -> NextStepDTO:
             horde=[[UnitDTO(id=i, type=UnitType.archer, **Settings().forces.horde.archer.dict()) for i in range(5, 10)]]
         )
     )
-
 
 
 @router.get('/undo')
