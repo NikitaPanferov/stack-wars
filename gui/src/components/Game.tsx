@@ -3,68 +3,127 @@ import { useSpring, animated } from "react-spring";
 import Spritesheet from "react-responsive-spritesheet";
 import { Army, ArmyType, UnitType } from "../types";
 import { spriteFactory } from "../factories";
+import { Tooltip } from "antd";
 
-const unitSpacing = 5; // расстояние между юнитами
+const AnimatedSpritesheet = animated(Spritesheet);
+
+const renderUnit = (
+  armyType: ArmyType,
+  unit: UnitType,
+  maxHeight: number,
+  spacing?: number
+) => {
+  console.log({ spacing });
+
+  const { image, width, height, steps, fps, offsetX, offsetY } =
+    spriteFactory.createSprite(armyType, unit);
+  const springProps = useSpring({
+    to: { opacity: 1 },
+    from: { opacity: 0 },
+    reset: true,
+    config: { duration: 500 },
+  });
+
+  return (
+    <Tooltip title={unit} key={unit}>
+      <div
+        style={{
+          width: width,
+          height: maxHeight,
+          display: "flex",
+          alignItems: "flex-end",
+          justifyContent: "center",
+          position: "relative",
+          marginRight: (armyType === "alliance" && spacing) || 0,
+          marginLeft: (armyType === "horde" && spacing) || 0,
+        }}
+      >
+        <AnimatedSpritesheet
+          style={{
+            ...springProps,
+            width: width,
+            height: height,
+            transform: armyType === "horde" ? "scaleX(-1)" : "none",
+            position: "absolute",
+            left: offsetX || 0,
+          }}
+          className={`spritesheet-${armyType}-${unit}`}
+          image={image}
+          widthFrame={width}
+          heightFrame={height}
+          steps={steps}
+          fps={fps}
+          autoplay
+          loop
+        />
+      </div>
+    </Tooltip>
+  );
+};
+
+const renderArmy = (armyType: ArmyType, army: Army, containerWidth: number) => {
+  // находим максимальные высоту и ширину юнитов для корректного выравнивания
+  const maxHeight = Math.max(
+    ...army.flatMap((row) =>
+      row.map((unit) => spriteFactory.createSprite(armyType, unit.type).height)
+    )
+  );
+
+  const unitWidths = army.flatMap((row) =>
+    row.map((unit) => spriteFactory.createSprite(armyType, unit.type).width)
+  );
+
+  const totalUnitWidth = unitWidths.reduce((acc, width) => acc + width, 0);
+  let spacing = (containerWidth - totalUnitWidth) / (army[0].length - 1);
+
+  console.log({ spacing });
+
+  return (
+    <div
+      style={{
+        display: "flex",
+        justifyContent: "center",
+        flexDirection: armyType === "alliance" ? "row-reverse" : "row",
+        flexWrap: "nowrap",
+      }}
+    >
+      {army.flatMap((row) =>
+        row.map((unit, i) => {
+          console.log({unit, i});
+          if (i === 0) {
+            return renderUnit(armyType, unit.type, maxHeight, 0);
+          }
+          return renderUnit(armyType, unit.type, maxHeight, spacing);
+        })
+      )}
+    </div>
+  );
+};
 
 export type GameProps = {
   alliance: Army;
   horde: Army;
 };
 
-const AnimatedSpritesheet = animated(Spritesheet);
-
 export const Game: React.FC<GameProps> = ({ alliance, horde }) => {
-  const renderUnit = (armyType: ArmyType, unit: UnitType, x: number, y: number, maxHeight: number) => {
-    const { image, width, height, steps, fps } = spriteFactory.createSprite(armyType, unit);
-    const springProps = useSpring({
-      to: { opacity: 1 },
-      from: { opacity: 0 },
-      reset: true,
-      config: { duration: 500 }
-    });
-
-    const offsetY = maxHeight - height; // смещение по оси Y для выравнивания по нижнему краю
-
-    return (
-      <AnimatedSpritesheet
-        style={{
-          ...springProps,
-          position: 'absolute',
-          left: x,
-          top: y + offsetY, // учитываем смещение по оси Y
-          width: width,
-          height: height,
-          transform: armyType === 'horde' ? 'scaleX(-1)' : 'none'
-        }}
-        className={`spritesheet-${armyType}-${unit}`}
-        image={image}
-        widthFrame={width}
-        heightFrame={height}
-        steps={steps}
-        fps={fps}
-        autoplay
-        loop
-      />
-    );
-  };
-
-  const renderArmy = (armyType: ArmyType, army: Army, xOffset: number, yOffset: number) => {
-    // находим максимальную высоту юнитов для корректного выравнивания
-    const maxHeight = Math.max(...army.flatMap(row => row.map(unit => spriteFactory.createSprite(armyType, unit.type).height)));
-
-    return army.flatMap((row, rowIndex) =>
-      row.map((unit, colIndex) => {
-        const x = xOffset + colIndex * (unitSpacing + 64); // включая spacing и размер
-        const y = yOffset + rowIndex * (maxHeight + unitSpacing); // учитываем максимальную высоту юнита
-        return renderUnit(armyType, unit.type, x, y, maxHeight);
-      })
-    );
-  };
+  const containerWidth = 1000; // ширина контейнера
+  console.log({alliance});
+  
 
   return (
-    <div style={{ width: 800, height: 600, backgroundColor: '#10bb99', position: 'relative' }}>
-      {renderArmy('alliance', alliance, 50, 50)}
-      {renderArmy('horde', horde, 400, 50)}
+    <div
+      style={{
+        width: containerWidth,
+        height: 600,
+        backgroundColor: "#10bb99",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        padding: "20px",
+      }}
+    >
+      <div>{renderArmy("alliance", alliance, containerWidth / 2)}</div>
+      <div>{renderArmy("horde", horde, containerWidth / 2)}</div>
     </div>
   );
 };
