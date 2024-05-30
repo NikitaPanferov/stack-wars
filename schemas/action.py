@@ -14,6 +14,6 @@ class ActionType(str, Enum):
 
 class Action(BaseModel):
     type: ActionType
-    object: int
-    subject: int
+    object: str
+    subject: str
     value: int
