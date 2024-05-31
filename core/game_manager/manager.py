@@ -25,10 +25,10 @@ class GameManager(metaclass=SingletonMeta):
         self.command_manager = CommandManager()
         self.strategy: AbcStrategy = OneLineStrategy()
 
-    def __get_game_state(self) -> GameState:
-        return GameState.from_class(alliance=self.alliance.units, horde=self.horde.units)
+    def __get_game_state(self) -> GameStateDTO:
+        return GameStateDTO.from_class(alliance=self.alliance.units, horde=self.horde.units)
 
-    def start_new_game(self, armies: InitArmiesDTO) -> GameState:
+    def start_new_game(self, armies: InitArmiesDTO) -> GameStateDTO:
         self.alliance.init(armies.alliance)
         self.horde.init(armies.horde)
 
