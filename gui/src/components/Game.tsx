@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useMemo } from "react";
 import { useSpring, animated, SpringValue } from "react-spring";
 import Spritesheet from "react-responsive-spritesheet";
 import {
@@ -27,7 +27,8 @@ const renderUnit = (
     opacity: SpringValue<number>;
   },
   config: Config,
-  spacing?: number
+  spacing?: number,
+  attackState?: { [key: string]: string }
 ) => {
   const { image, width, height, steps, fps, offsetX, offsetY } =
     spriteFactory.createSprite(armyType, unit.type);
@@ -40,11 +41,14 @@ const renderUnit = (
 
   const maxHP = config.forces[armyType][unit.type].hp;
   const hpPercentage = unit.hp && maxHP ? (unit.hp / maxHP) * 100 : 100;
-  const colorIntensity = Math.round((hpPercentage / 100) * 255);
+  const colorIntensity = 255 - Math.round((hpPercentage / 100) * 255);
   const color = `rgb(255, ${colorIntensity}, ${colorIntensity})`;
 
+  const isAttacking = attackState && attackState[unit.id] === "attacking";
+  const isAttacked = attackState && attackState[unit.id] === "attacked";
+
   return (
-    <Tooltip title={unit.type} key={unit.type}>
+    <Tooltip title={unit.type} key={unit.id}>
       <div
         style={{
           width: width,
@@ -90,9 +94,10 @@ const renderArmy = (
   springProps: {
     opacity: SpringValue<number>;
   },
-  config: Config
+  config: Config,
+  attackState?: { [key: string]: string }
 ) => {
-  const maxHeight = 128
+  const maxHeight = 128;
 
   return army.map((row, rowIndex) => {
     const totalRowUnitWidth = row.length * 128;
@@ -112,30 +117,33 @@ const renderArmy = (
         }}
       >
         {row.map((unit, i) => {
-          if (i === 0) {
+          return useMemo(() => {
+            if (i === 0) {
+              return renderUnit(
+                armyType,
+                unit,
+                maxHeight,
+                springProps,
+                config,
+                -20,
+                attackState
+              );
+            }
             return renderUnit(
               armyType,
               unit,
               maxHeight,
               springProps,
               config,
-              -20
+              spacing,
+              attackState
             );
-          }
-          return renderUnit(
-            armyType,
-            unit,
-            maxHeight,
-            springProps,
-            config,
-            spacing
-          );
+          }, [unit, attackState]);
         })}
       </div>
     );
   });
 };
-
 
 export type GameProps = {
   alliance: Army;
@@ -150,12 +158,14 @@ export const Game: React.FC<GameProps> = ({
   horde,
   setAlliance,
   setHorde,
-  config
+  config,
 }) => {
   const [width, setWidth] = useState(0);
   const divRef = useRef(null);
 
   const [actions, setActions] = useState<Action[]>([]);
+  const [attackState, setAttackState] = useState<{ [key: string]: string }>({});
+  const [currentActionIndex, setCurrentActionIndex] = useState(0);
 
   useEffect(() => {
     const handleResize = (entries: ResizeObserverEntry[]) => {
@@ -177,6 +187,36 @@ export const Game: React.FC<GameProps> = ({
     };
   }, []);
 
+  useEffect(() => {
+    if (
+      actions.length > 0 &&
+      currentActionIndex !== -1 &&
+      currentActionIndex < actions.length
+    ) {
+      const action = actions[currentActionIndex];
+      const newAttackState: { [key: string]: string } = {};
+      if (action.type === "attack") {
+        newAttackState[action.subject] = "attacking";
+        newAttackState[action.object] = "attacked";
+      }
+      setAttackState(newAttackState);
+
+      const attackTimeout = setTimeout(() => {
+        setAttackState({});
+        const delayTimeout = setTimeout(() => {
+          setCurrentActionIndex(currentActionIndex + 1);
+        }, 500); // Задержка между атаками 500 мс
+
+        return () => clearTimeout(delayTimeout);
+      }, 200); // Длительность атаки 200 мс
+
+      return () => clearTimeout(attackTimeout);
+    } else {
+      setAttackState({});
+      setCurrentActionIndex(-1);
+    }
+  }, [actions, currentActionIndex]);
+
   const [selectedStrategy, setSelectedStrategy] =
     useState<Strategy>("one_line");
 
@@ -190,6 +230,7 @@ export const Game: React.FC<GameProps> = ({
       console.log(data);
       setGameState(data.game_state);
       setActions(data.actions);
+      setCurrentActionIndex(0);
     },
   });
 
@@ -237,13 +278,41 @@ export const Game: React.FC<GameProps> = ({
             padding: "20px",
           }}
         >
-          <div style={{ width: '50%', display: 'flex', justifyContent: 'flex-end' }}>
-            {alliance && config &&
-              renderArmy("alliance", alliance, width / 2, springProps, config)}
+          <div
+            style={{
+              width: "50%",
+              display: "flex",
+              justifyContent: "flex-end",
+            }}
+          >
+            {alliance &&
+              config &&
+              renderArmy(
+                "alliance",
+                alliance,
+                width / 2,
+                springProps,
+                config,
+                attackState
+              )}
           </div>
-          <div style={{ width: '50%', display: 'flex', justifyContent: 'flex-start' }}>
-            {horde && config &&
-              renderArmy("horde", horde, width / 2, springProps, config)}
+          <div
+            style={{
+              width: "50%",
+              display: "flex",
+              justifyContent: "flex-start",
+            }}
+          >
+            {horde &&
+              config &&
+              renderArmy(
+                "horde",
+                horde,
+                width / 2,
+                springProps,
+                config,
+                attackState
+              )}
           </div>
         </div>
         <ActionPanel
