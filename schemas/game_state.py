@@ -13,6 +13,6 @@ class GameState(BaseModel):
     @classmethod
     def from_class(cls, alliance: List[List[Unit]], horde: List[List[Unit]]):
         return cls(
-            alliance=[[UnitDTO.from_orm(unit) for unit in units] for units in alliance],
-            horde=[[UnitDTO.from_orm(unit) for unit in units] for units in horde],
+            alliance=[[UnitDTO.from_class(unit) for unit in units] for units in alliance],
+            horde=[[UnitDTO.from_class(unit) for unit in units] for units in horde],
         )

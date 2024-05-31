@@ -6,9 +6,10 @@ from core.army.army_factory import ArmyFactory
 from core.commands.manager import CommandManager
 from core.commands.commands.attack import Attack
 
-from core.strategy import AbcStrategy, OneLineStrategy
+from core.strategy import AbcStrategy, OneLineStrategy, strategies
 from misc.singleton import SingletonMeta
 from schemas import InitArmiesDTO, Action, ActionType, UnitDTO, NextStepDTO, GameState
+from schemas.strategy_type import StrategyType
 
 
 class GameManager(metaclass=SingletonMeta):
@@ -17,6 +18,9 @@ class GameManager(metaclass=SingletonMeta):
         self.horde: Army | None = None
         self.command_manager = CommandManager()
         self.strategy: AbcStrategy = OneLineStrategy()
+
+    def __get_game_state(self) -> GameState:
+        return GameState.from_class(alliance=self.alliance.units, horde=self.horde.units)
 
     def start_new_game(self, armies: InitArmiesDTO) -> GameState:
         alliance_factory = ArmyFactory.factory("alliance")
@@ -28,7 +32,7 @@ class GameManager(metaclass=SingletonMeta):
         self.alliance = Army(alliance_builder, armies.alliance)
         self.horde = Army(horde_builder, armies.horde)
 
-        return GameState.from_class(alliance=self.alliance.units, horde=self.horde.units)
+        return self.__get_game_state()
 
     def next_step(self) -> NextStepDTO:
         actions: List[Action] = []
@@ -38,10 +42,10 @@ class GameManager(metaclass=SingletonMeta):
             count_units = max(len(self.alliance.units[row]), len(self.horde.units[row]))
 
             for i in range(count_units):
-                alliance_unit = self.alliance.units[row][i]
-                horde_unit = self.horde.units[row][i]
 
                 if i == 0:
+                    alliance_unit = self.alliance.units[row][i]
+                    horde_unit = self.horde.units[row][i]
                     attackCommand = Attack(alliance_unit, horde_unit)
                     self.command_manager.execute(attackCommand)
                     action = Action(
@@ -85,11 +89,14 @@ class GameManager(metaclass=SingletonMeta):
 
         return NextStepDTO(
             actions=actions,
-            game_state=GameState(
-                alliance=[[UnitDTO.from_orm(unit) for unit in row] for row in self.alliance.units],
-                horde=[[UnitDTO.from_orm(unit) for unit in row] for row in self.horde.units],
-            ),
+            game_state=self.__get_game_state()
         )
+
+    def change_strategy(self, strategy: StrategyType) -> GameState:
+        self.strategy = strategies[strategy]
+        print(self.alliance.units, self.horde.units)
+        self.strategy.rebuild_armies(self.alliance, self.horde)
+        return self.__get_game_state()
 
 
 async def game_manager() -> AsyncGenerator[GameManager, None]:

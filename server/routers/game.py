@@ -73,22 +73,5 @@ async def redo() -> GameState:
 
 
 @router.get("/change_strategy")
-async def change_strategy(strategy: StrategyType) -> GameState:
-    return GameState(
-        alliance=[
-            [
-                UnitDTO(
-                    id=0,
-                    type=UnitType.archer,
-                    **Settings().forces.alliance.paladin.dict()
-                )
-            ]
-        ],
-        horde=[
-            [
-                UnitDTO(
-                    id=1, type=UnitType.archer, **Settings().forces.horde.paladin.dict()
-                )
-            ]
-        ],
-    )
+async def change_strategy(strategy: StrategyType, gm: Annotated[GameManager, Depends(game_manager)]) -> GameState:
+    return gm.change_strategy(strategy)
