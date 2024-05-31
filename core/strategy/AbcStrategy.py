@@ -13,9 +13,10 @@ class AbcStrategy(ABC):
         pass
 
     @abstractmethod
-    def handle_undo(self, from_i: int, from_j:int, to_i: int, to_j: int, army: Army):
+    def handle_undo(self, from_i: int, from_j: int, to_i: int, to_j: int, army: Army):
         pass
 
-    def move_units_to_first_row(self, army: Army) -> Army:
-        army.units = [unit for row in army.units for unit in row]
+    @staticmethod
+    def move_units_to_first_row(army: Army) -> Army:
+        army.units = [[unit for unit in row] for row in army.units]
         return army

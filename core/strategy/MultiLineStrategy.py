@@ -22,5 +22,5 @@ class MultiLineStrategy(AbcStrategy):
         self.move_units_to_first_row(alliance)
         self.move_units_to_first_row(horde)
 
-        alliance.units = [alliance.units[i::3] for i in range(3)]
-        horde.units = [horde.units[i::3] for i in range(3)]
+        alliance.units = [alliance.units[0][i::3] for i in range(3)]
+        horde.units = [horde.units[0][i::3] for i in range(3)]
