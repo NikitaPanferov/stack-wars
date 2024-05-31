@@ -16,7 +16,6 @@ const actionTypeToText = {
 };
 
 export const ActionList: React.FC<ActionListProps> = ({ actions }) => {
-  console.log({actions});
 
   return (
     <List
