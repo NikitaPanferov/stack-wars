@@ -8,7 +8,7 @@ from core.commands.commands.attack import Attack
 
 from core.strategy import AbcStrategy, OneLineStrategy, strategies
 from misc.singleton import SingletonMeta
-from schemas import InitArmiesDTO, Action, ActionType, UnitDTO, NextStepDTO, GameState
+from schemas import InitArmiesDTO, Action, ActionType, NextStepDTO, GameStateDTO
 from schemas.strategy_type import StrategyType
 
 
@@ -25,10 +25,10 @@ class GameManager(metaclass=SingletonMeta):
         self.command_manager = CommandManager()
         self.strategy: AbcStrategy = OneLineStrategy()
 
-    def __get_game_state(self) -> GameState:
-        return GameState.from_class(alliance=self.alliance.units, horde=self.horde.units)
+    def __get_game_state(self) -> GameStateDTO:
+        return GameStateDTO.from_class(alliance=self.alliance.units, horde=self.horde.units)
 
-    def start_new_game(self, armies: InitArmiesDTO) -> GameState:
+    def start_new_game(self, armies: InitArmiesDTO) -> GameStateDTO:
         self.alliance.init(armies.alliance)
         self.horde.init(armies.horde)
 
@@ -92,7 +92,7 @@ class GameManager(metaclass=SingletonMeta):
             game_state=self.__get_game_state()
         )
 
-    def change_strategy(self, strategy: StrategyType) -> GameState:
+    def change_strategy(self, strategy: StrategyType) -> GameStateDTO:
         self.strategy = strategies[strategy]
         print(self.alliance.units, self.horde.units, '\n\n\n\n')
         self.strategy.rebuild_armies(alliance=self.alliance, horde=self.horde)
