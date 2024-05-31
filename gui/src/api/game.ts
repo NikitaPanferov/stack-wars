@@ -5,8 +5,8 @@ import { api } from "./api";
 export async function startGame(
   alliance: string[],
   horde: string[]
-): Promise<AxiosResponse<GameState>> {
-  return api.post<GameState>("/game/start", { alliance, horde });
+): Promise<AxiosResponse<NextStepDTO>> {
+  return api.post<NextStepDTO>("/game/start", { alliance, horde });
 }
 
 export async function nextStep(): Promise<AxiosResponse<NextStepDTO>> {

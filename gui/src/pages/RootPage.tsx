@@ -23,10 +23,10 @@ export const RootPage = () => {
   const mutation = useMutation(
     () => startGame(selectedAlliance, selectedHorde),
     {
-      onSuccess: ({ data }) => {
+      onSuccess: ({ data: {game_state} }) => {
         setGameStatus(GameStatus.game);
-        setAlliance(data.alliance);
-        setHorde(data.horde);
+        setAlliance(game_state.alliance);
+        setHorde(game_state.horde);
       },
     }
   );
