@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { Army, GameState, GameStatus } from "../types";
-import { Button, Card, Spin, Flex } from "antd";
-import { useQuery, useMutation, useQueryClient } from "react-query";
+import { Army, Config, GameStatus } from "../types";
+import { Button, Card } from "antd";
+import { useQuery, useMutation } from "react-query";
 import { fetchConfig, startGame } from "../api";
 import { ArmySelection, Game, GameResult } from "../components";
 
@@ -9,12 +9,17 @@ export const RootPage = () => {
   const [selectedAlliance, setSelectedAlliance] = useState<string[]>([]);
   const [selectedHorde, setSelectedHorde] = useState<string[]>([]);
   const [gameStatus, setGameStatus] = useState<GameStatus>(GameStatus.off);
-  const queryClient = useQueryClient();
 
   const [alliance, setAlliance] = useState<Army>({} as Army);
   const [horde, setHorde] = useState<Army>({} as Army);
 
-  const { data, error, isLoading } = useQuery("config", fetchConfig);
+  const [config, setConfig] = useState<Config>();
+
+  const { data, error, isLoading } = useQuery<Config>("config", fetchConfig, {
+    onSuccess: (config) => {
+      setConfig(config);
+    },
+  });
   const mutation = useMutation(
     () => startGame(selectedAlliance, selectedHorde),
     {
@@ -73,7 +78,17 @@ export const RootPage = () => {
   }
 
   if (gameStatus === GameStatus.game) {
-    return <Game alliance={alliance} horde={horde} setAlliance={setAlliance} setHorde={setHorde}/>;
+    return (
+      config && (
+        <Game
+          alliance={alliance}
+          horde={horde}
+          setAlliance={setAlliance}
+          setHorde={setHorde}
+          config={config}
+        />
+      )
+    );
   }
 
   if (gameStatus === GameStatus.results) {

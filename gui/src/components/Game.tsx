@@ -5,9 +5,10 @@ import {
   Action,
   Army,
   ArmyType,
+  Config,
   GameState,
   Strategy,
-  UnitType,
+  Unit,
 } from "../types";
 import { spriteFactory } from "../factories";
 import { Tooltip, Card } from "antd";
@@ -20,24 +21,30 @@ const AnimatedSpritesheet = animated(Spritesheet);
 
 const renderUnit = (
   armyType: ArmyType,
-  unit: UnitType,
+  unit: Unit,
   maxHeight: number,
   springProps: {
     opacity: SpringValue<number>;
   },
+  config: Config,
   spacing?: number
 ) => {
   const { image, width, height, steps, fps, offsetX, offsetY } =
-    spriteFactory.createSprite(armyType, unit);
+    spriteFactory.createSprite(armyType, unit.type);
   const isLittleUnit =
     armyType === "horde" &&
-    ["light_swordsman", "heavy_swordsman", "paladin"].includes(unit);
+    ["light_swordsman", "heavy_swordsman", "paladin"].includes(unit.type);
   if (isLittleUnit) {
     spacing = spacing && spacing + 16;
   }
 
+  const maxHP = config.forces[armyType][unit.type].hp;
+  const hpPercentage = unit.hp && maxHP ? (unit.hp / maxHP) * 100 : 100;
+  const colorIntensity = Math.round((hpPercentage / 100) * 255);
+  const color = `rgb(255, ${colorIntensity}, ${colorIntensity})`;
+
   return (
-    <Tooltip title={unit} key={unit}>
+    <Tooltip title={unit.type} key={unit.type}>
       <div
         style={{
           width: width,
@@ -50,6 +57,7 @@ const renderUnit = (
             (armyType === "alliance" ? spacing : isLittleUnit && 16) || 0,
           marginLeft: (armyType === "horde" && spacing) || 0,
         }}
+        id={unit.id}
       >
         <AnimatedSpritesheet
           style={{
@@ -59,6 +67,7 @@ const renderUnit = (
             transform: armyType === "horde" ? "scaleX(-1)" : "none",
             position: "absolute",
             left: offsetX || 0,
+            filter: `drop-shadow(0 0 10px ${color})`,
           }}
           className={`spritesheet-${armyType}-${unit}`}
           image={image}
@@ -80,13 +89,10 @@ const renderArmy = (
   containerWidth: number,
   springProps: {
     opacity: SpringValue<number>;
-  }
+  },
+  config: Config
 ) => {
-  const maxHeight = Math.max(
-    ...army.flatMap((row) =>
-      row.map((unit) => spriteFactory.createSprite(armyType, unit.type).height)
-    )
-  );
+  const maxHeight = 128
 
   return army.map((row, rowIndex) => {
     const totalRowUnitWidth = row.length * 128;
@@ -107,13 +113,21 @@ const renderArmy = (
       >
         {row.map((unit, i) => {
           if (i === 0) {
-            return renderUnit(armyType, unit.type, maxHeight, springProps, -20);
+            return renderUnit(
+              armyType,
+              unit,
+              maxHeight,
+              springProps,
+              config,
+              -20
+            );
           }
           return renderUnit(
             armyType,
-            unit.type,
+            unit,
             maxHeight,
             springProps,
+            config,
             spacing
           );
         })}
@@ -122,11 +136,13 @@ const renderArmy = (
   });
 };
 
+
 export type GameProps = {
   alliance: Army;
   horde: Army;
   setAlliance: React.Dispatch<React.SetStateAction<Army>>;
   setHorde: React.Dispatch<React.SetStateAction<Army>>;
+  config: Config;
 };
 
 export const Game: React.FC<GameProps> = ({
@@ -134,6 +150,7 @@ export const Game: React.FC<GameProps> = ({
   horde,
   setAlliance,
   setHorde,
+  config
 }) => {
   const [width, setWidth] = useState(0);
   const divRef = useRef(null);
@@ -220,12 +237,13 @@ export const Game: React.FC<GameProps> = ({
             padding: "20px",
           }}
         >
-          <div>
-            {alliance &&
-              renderArmy("alliance", alliance, width / 2, springProps)}
+          <div style={{ width: '50%', display: 'flex', justifyContent: 'flex-end' }}>
+            {alliance && config &&
+              renderArmy("alliance", alliance, width / 2, springProps, config)}
           </div>
-          <div>
-            {horde && renderArmy("horde", horde, width / 2, springProps)}
+          <div style={{ width: '50%', display: 'flex', justifyContent: 'flex-start' }}>
+            {horde && config &&
+              renderArmy("horde", horde, width / 2, springProps, config)}
           </div>
         </div>
         <ActionPanel
