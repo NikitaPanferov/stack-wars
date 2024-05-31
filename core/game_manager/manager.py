@@ -14,8 +14,14 @@ from schemas.strategy_type import StrategyType
 
 class GameManager(metaclass=SingletonMeta):
     def __init__(self):
-        self.alliance: Army | None = None
-        self.horde: Army | None = None
+        alliance_factory = ArmyFactory.factory("alliance")
+        horde_factory = ArmyFactory.factory("horde")
+
+        alliance_builder = ArmyBuilder(alliance_factory)
+        horde_builder = ArmyBuilder(horde_factory)
+
+        self.alliance = Army(alliance_builder)
+        self.horde = Army(horde_builder)
         self.command_manager = CommandManager()
         self.strategy: AbcStrategy = OneLineStrategy()
 
@@ -23,14 +29,8 @@ class GameManager(metaclass=SingletonMeta):
         return GameState.from_class(alliance=self.alliance.units, horde=self.horde.units)
 
     def start_new_game(self, armies: InitArmiesDTO) -> GameState:
-        alliance_factory = ArmyFactory.factory("alliance")
-        horde_factory = ArmyFactory.factory("horde")
-
-        alliance_builder = ArmyBuilder(alliance_factory)
-        horde_builder = ArmyBuilder(horde_factory)
-
-        self.alliance = Army(alliance_builder, armies.alliance)
-        self.horde = Army(horde_builder, armies.horde)
+        self.alliance.init(armies.alliance)
+        self.horde.init(armies.horde)
 
         return self.__get_game_state()
 
