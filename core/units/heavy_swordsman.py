@@ -1,7 +1,9 @@
 from __future__ import annotations
 from core.units.interfaces import Unit, Healable
+from misc.lazy import lazy
 
 
+@lazy
 class HeavySwordsman(Unit, Healable):
     heal_percent: int
 

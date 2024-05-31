@@ -32,7 +32,7 @@ class UnitDTO(BaseModel, ConfigUnit):
         use_enum_values = True
 
     @classmethod
-    def from_orm(cls, unit: Unit):
+    def from_class(cls, unit: Unit):
         return cls(
             type=ClassName_UnitType.get(unit.__class__.__name__),
             hp=unit.hp,

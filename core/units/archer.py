@@ -1,8 +1,10 @@
 from __future__ import annotations
 
 from core.units.interfaces import Unit, Ability, Healable, Cloneable
+from misc.lazy import lazy
 
 
+@lazy
 class Archer(Unit, Ability, Healable, Cloneable):
     range: int
     heal_percent: int

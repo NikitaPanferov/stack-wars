@@ -1,7 +1,9 @@
 from __future__ import annotations
 from core.units.interfaces import Unit, Ability, Cloneable, Healable
+from misc.lazy import lazy
 
 
+@lazy
 class Paladin(Unit, Ability, Cloneable, Healable):
     range: int
     heal_percent: int

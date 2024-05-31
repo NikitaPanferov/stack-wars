@@ -4,10 +4,7 @@ import random
 from abc import ABC
 from uuid import uuid4
 
-from misc.lazy import lazy
 
-
-@lazy
 class Unit(ABC):
     id: str
     hp: int

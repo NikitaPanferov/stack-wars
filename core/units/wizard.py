@@ -1,7 +1,9 @@
 from __future__ import annotations
 from core.units.interfaces import Unit, Healable, Ability
+from misc.lazy import lazy
 
 
+@lazy
 class Wizard(Unit, Healable, Ability):
     range: int
     heal_percent: int

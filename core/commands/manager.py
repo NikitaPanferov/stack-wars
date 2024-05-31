@@ -2,11 +2,11 @@ from typing import List
 
 from core.commands.command import Command
 
-class ActionManager:
+
+class CommandManager:
     def __init__(self):
         self._history: List[List[Command]] = [[]]
         self._current_step = 0
-
 
     def _get_last_step(self) -> List[Command]:
         return self._history[self._current_step]
