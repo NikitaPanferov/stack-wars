@@ -5,7 +5,7 @@ from .MultiLineStrategy import MultiLineStrategy
 from .WallToWallStrategy import WallToWallStrategy
 
 strategies = {
-    StrategyType.one_line: OneLineStrategy,
-    StrategyType.multi_line: MultiLineStrategy,
-    StrategyType.wall_to_wall: WallToWallStrategy
+    StrategyType.one_line: OneLineStrategy(),
+    StrategyType.multi_line: MultiLineStrategy(),
+    StrategyType.wall_to_wall: WallToWallStrategy(),
 }

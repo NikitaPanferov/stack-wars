@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import Dict, List
+from typing import List, Tuple
 
 
 from core.army.army_builder import ArmyBuilder
@@ -8,23 +8,27 @@ from schemas.unitDTO import UnitType
 
 
 class Army:
-    def __init__(self, army_builder: ArmyBuilder, units: List[UnitType]):
+    def __init__(self, army_builder: ArmyBuilder):
+        self.units: List[List[Unit]] = []
+        self.army_builder = army_builder
+
+    def init(self, units: List[UnitType]):
         for unit_name in units:
             match unit_name:
                 case "archer":
-                    army_builder.add_archer()
+                    self.army_builder.add_archer()
                 case "heavy_swordsman":
-                    army_builder.add_heavy_swordsman()
+                    self.army_builder.add_heavy_swordsman()
                 case "light_swordsman":
-                    army_builder.add_ligth_swordsman()
+                    self.army_builder.add_ligth_swordsman()
                 case "paladin":
-                    army_builder.add_paladin()
+                    self.army_builder.add_paladin()
                 case "wizard":
-                    army_builder.add_wizard()
+                    self.army_builder.add_wizard()
 
-        self.units = army_builder.build()
+        self.units = self.army_builder.build()
 
-    def delete_unit(self, unit_in: Unit) -> (int, int):
+    def delete_unit(self, unit_in: Unit) -> Tuple[int, int]:
         for i, first_list in enumerate(self.units):
             for j, unit in enumerate(first_list):
                 if unit.id == unit_in.id:
