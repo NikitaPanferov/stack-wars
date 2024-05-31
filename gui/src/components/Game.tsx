@@ -46,6 +46,19 @@ const renderUnit = (
 
   const isAttacking = attackState && attackState[unit.id] === "attacking";
   const isAttacked = attackState && attackState[unit.id] === "attacked";
+  const isDodged = attackState && attackState[unit.id] === "dodged";
+
+  let transformMove = "none";
+  if (isAttacking) {
+    transformMove =
+      armyType == "alliance" ? "rotate(15deg)" : "rotate(-15deg)";
+  }
+  if (isAttacked) {
+    transformMove = "scale(1.2)"
+  }
+  if (isDodged) {
+    transformMove = "translate(0, 10px)"
+  }
 
   return (
     <Tooltip title={unit.type} key={unit.id}>
@@ -60,11 +73,7 @@ const renderUnit = (
           marginRight:
             (armyType === "alliance" ? spacing : isLittleUnit && 16) || 0,
           marginLeft: (armyType === "horde" && spacing) || 0,
-          transform: isAttacking
-            ? armyType == "alliance"
-              ? "rotate(15deg)"
-              : "rotate(-15deg)"
-            : "none",
+          transform: transformMove,
           transition: "transform 200ms ease-in",
           transformOrigin: "bottom",
         }}
@@ -204,7 +213,11 @@ export const Game: React.FC<GameProps> = ({
       const newAttackState: { [key: string]: string } = {};
       if (action.type === "attack") {
         newAttackState[action.subject] = "attacking";
-        newAttackState[action.object] = "attacked";
+        if (action.value === 0) {
+          newAttackState[action.object] = "dodged";
+        } else {
+          newAttackState[action.object] = "attacked";
+        }
       }
       setAttackState(newAttackState);
 
