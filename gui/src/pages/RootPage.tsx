@@ -73,7 +73,7 @@ export const RootPage = () => {
   }
 
   if (gameStatus === GameStatus.game) {
-    return <Game alliance={alliance} horde={horde} />;
+    return <Game alliance={alliance} horde={horde} setAlliance={setAlliance} setHorde={setHorde}/>;
   }
 
   if (gameStatus === GameStatus.results) {

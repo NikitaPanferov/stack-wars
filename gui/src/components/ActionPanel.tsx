@@ -2,29 +2,29 @@ import { Button, Select } from "antd";
 import { AxiosResponse } from "axios";
 import React from "react";
 import { UseMutateFunction } from "react-query";
-import { GameState, Strategy } from "../types";
+import { NextStepDTO, Strategy } from "../types";
 
 export type ActionPanelProps = {
   nextStep: UseMutateFunction<
-    AxiosResponse<GameState, any>,
+    AxiosResponse<NextStepDTO, any>,
     unknown,
     void,
     unknown
   >;
   undoStep: UseMutateFunction<
-    AxiosResponse<GameState, any>,
+    AxiosResponse<NextStepDTO, any>,
     unknown,
     void,
     unknown
   >;
   redoStep: UseMutateFunction<
-    AxiosResponse<GameState, any>,
+    AxiosResponse<NextStepDTO, any>,
     unknown,
     void,
     unknown
   >;
   changeStrategy: UseMutateFunction<
-    AxiosResponse<GameState, any>,
+    AxiosResponse<NextStepDTO, any>,
     unknown,
     void,
     unknown

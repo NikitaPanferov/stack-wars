@@ -1,12 +1,20 @@
 import React, { useEffect, useRef, useState } from "react";
-import { useSpring, animated } from "react-spring";
+import { useSpring, animated, SpringValue } from "react-spring";
 import Spritesheet from "react-responsive-spritesheet";
-import { Army, ArmyType, GameState, Strategy, UnitType } from "../types";
+import {
+  Action,
+  Army,
+  ArmyType,
+  GameState,
+  Strategy,
+  UnitType,
+} from "../types";
 import { spriteFactory } from "../factories";
 import { Tooltip, Card } from "antd";
 import { useMutation } from "react-query";
 import { nextStep, undo, redo, changeStrategy } from "../api";
 import { ActionPanel } from "./ActionPanel";
+import { ActionList } from "./ActionList";
 
 const AnimatedSpritesheet = animated(Spritesheet);
 
@@ -14,16 +22,13 @@ const renderUnit = (
   armyType: ArmyType,
   unit: UnitType,
   maxHeight: number,
+  springProps: {
+    opacity: SpringValue<number>;
+  },
   spacing?: number
 ) => {
   const { image, width, height, steps, fps, offsetX, offsetY } =
     spriteFactory.createSprite(armyType, unit);
-  const springProps = useSpring({
-    to: { opacity: 1 },
-    from: { opacity: 0 },
-    reset: true,
-    config: { duration: 500 },
-  });
   const isLittleUnit =
     armyType === "horde" &&
     ["light_swordsman", "heavy_swordsman", "paladin"].includes(unit);
@@ -69,8 +74,14 @@ const renderUnit = (
   );
 };
 
-const renderArmy = (armyType: ArmyType, army: Army, containerWidth: number) => {
-  // находим максимальные высоту юнитов для корректного выравнивания
+const renderArmy = (
+  armyType: ArmyType,
+  army: Army,
+  containerWidth: number,
+  springProps: {
+    opacity: SpringValue<number>;
+  }
+) => {
   const maxHeight = Math.max(
     ...army.flatMap((row) =>
       row.map((unit) => spriteFactory.createSprite(armyType, unit.type).height)
@@ -96,9 +107,15 @@ const renderArmy = (armyType: ArmyType, army: Army, containerWidth: number) => {
       >
         {row.map((unit, i) => {
           if (i === 0) {
-            return renderUnit(armyType, unit.type, maxHeight, -20);
+            return renderUnit(armyType, unit.type, maxHeight, springProps, -20);
           }
-          return renderUnit(armyType, unit.type, maxHeight, spacing);
+          return renderUnit(
+            armyType,
+            unit.type,
+            maxHeight,
+            springProps,
+            spacing
+          );
         })}
       </div>
     );
@@ -120,6 +137,8 @@ export const Game: React.FC<GameProps> = ({
 }) => {
   const [width, setWidth] = useState(0);
   const divRef = useRef(null);
+
+  const [actions, setActions] = useState<Action[]>([]);
 
   useEffect(() => {
     const handleResize = (entries: ResizeObserverEntry[]) => {
@@ -150,38 +169,49 @@ export const Game: React.FC<GameProps> = ({
   };
 
   const nextStepMutation = useMutation(nextStep, {
-    onSuccess: ({ data: newGameState }) => {
-      setGameState(newGameState);
+    onSuccess: ({ data }) => {
+      console.log(data);
+      setGameState(data.game_state);
+      setActions(data.actions);
     },
   });
 
   const undoMutation = useMutation(undo, {
-    onSuccess: ({ data: newGameState }) => {
-      setGameState(newGameState);
+    onSuccess: ({ data }) => {
+      setGameState(data.game_state);
+      setActions(data.actions);
     },
   });
 
   const redoMutation = useMutation(redo, {
-    onSuccess: ({ data: newGameState }) => {
-      setGameState(newGameState);
+    onSuccess: ({ data }) => {
+      setGameState(data.game_state);
+      setActions(data.actions);
     },
   });
 
   const changeStrategyMutation = useMutation(
     () => changeStrategy(selectedStrategy),
     {
-      onSuccess: ({ data: newGameState }) => {
-        setGameState(newGameState);
+      onSuccess: ({ data }) => {
+        setGameState(data.game_state);
       },
     }
   );
+
+  const springProps = useSpring({
+    to: { opacity: 1 },
+    from: { opacity: 0 },
+    reset: true,
+    config: { duration: 500 },
+  });
 
   return (
     <Card>
       <div ref={divRef}>
         <div
           style={{
-            minHeight: 600,
+            minHeight: 300,
             backgroundColor: "#758D45",
             borderRadius: 20,
             display: "flex",
@@ -190,8 +220,13 @@ export const Game: React.FC<GameProps> = ({
             padding: "20px",
           }}
         >
-          <div>{renderArmy("alliance", alliance, width / 2)}</div>
-          <div>{renderArmy("horde", horde, width / 2)}</div>
+          <div>
+            {alliance &&
+              renderArmy("alliance", alliance, width / 2, springProps)}
+          </div>
+          <div>
+            {horde && renderArmy("horde", horde, width / 2, springProps)}
+          </div>
         </div>
         <ActionPanel
           nextStep={nextStepMutation.mutate}
@@ -201,6 +236,7 @@ export const Game: React.FC<GameProps> = ({
           selectedStrategy={selectedStrategy}
           setSelectedStrategy={setSelectedStrategy}
         />
+        <ActionList actions={actions} />
       </div>
     </Card>
   );
