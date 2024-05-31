@@ -34,4 +34,6 @@ class ArmyBuilder:
         return self
 
     def build(self) -> List[List[Unit]]:
-        return [self.units]
+        units = [*self.units]
+        self.units = []
+        return [units]

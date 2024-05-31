@@ -18,7 +18,7 @@ router = APIRouter(prefix="/game")
 async def start_game(
     armies: InitArmiesDTO, gm: Annotated[GameManager, Depends(game_manager)]
 ) -> GameState:
-    return gm.start_new_game(armies)
+    return GameState(game_state=gm.start_new_game(armies))
 
 
 @router.get("/next_step")
@@ -74,4 +74,4 @@ async def redo() -> GameState:
 
 @router.get("/change_strategy")
 async def change_strategy(strategy: StrategyType, gm: Annotated[GameManager, Depends(game_manager)]) -> GameState:
-    return gm.change_strategy(strategy)
+    return GameState(game_state=gm.change_strategy(strategy))
