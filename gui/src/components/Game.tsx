@@ -41,7 +41,7 @@ const renderUnit = (
 
   const maxHP = config.forces[armyType][unit.type].hp;
   const hpPercentage = unit.hp && maxHP ? (unit.hp / maxHP) * 100 : 100;
-  const colorIntensity = 255 - Math.round((hpPercentage / 100) * 255);
+  const colorIntensity = Math.round((hpPercentage / 100) * 255);
   const color = `rgb(255, ${colorIntensity}, ${colorIntensity})`;
 
   const isAttacking = attackState && attackState[unit.id] === "attacking";
