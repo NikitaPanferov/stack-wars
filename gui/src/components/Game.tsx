@@ -24,7 +24,7 @@ const renderUnit = (
   unit: Unit,
   maxHeight: number,
   springProps: {
-    opacity: SpringValue<number>;
+    opacity?: SpringValue<number>;
   },
   config: Config,
   spacing?: number,
@@ -108,7 +108,7 @@ const renderArmy = (
   army: Army,
   containerWidth: number,
   springProps: {
-    opacity: SpringValue<number>;
+    opacity?: SpringValue<number>;
   },
   config: Config,
   attackState?: { [key: string]: string }
@@ -241,6 +241,8 @@ export const Game: React.FC<GameProps> = ({
     useState<Strategy>("one_line");
 
   const setGameState = (gameState: GameState) => {
+    console.log({ alliance, horde });
+
     setAlliance(gameState.alliance);
     setHorde(gameState.horde);
   };
@@ -278,8 +280,6 @@ export const Game: React.FC<GameProps> = ({
   );
 
   const springProps = useSpring({
-    to: { opacity: 1 },
-    from: { opacity: 0 },
     reset: true,
     config: { duration: 500 },
   });
