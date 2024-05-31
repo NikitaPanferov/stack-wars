@@ -60,6 +60,13 @@ const renderUnit = (
           marginRight:
             (armyType === "alliance" ? spacing : isLittleUnit && 16) || 0,
           marginLeft: (armyType === "horde" && spacing) || 0,
+          transform: isAttacking
+            ? armyType == "alliance"
+              ? "rotate(15deg)"
+              : "rotate(-15deg)"
+            : "none",
+          transition: "transform 200ms ease-in",
+          transformOrigin: "bottom",
         }}
         id={unit.id}
       >
