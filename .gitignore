@@ -162,3 +162,5 @@ cython_debug/
 
 
 pyrightconfig.json
+
+*/node_modules
