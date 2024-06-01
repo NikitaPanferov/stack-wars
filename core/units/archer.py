@@ -4,7 +4,6 @@ from core.units.interfaces import Unit, Ability, Healable, Cloneable
 from misc.lazy import lazy
 
 
-@lazy
 class Archer(Unit, Ability, Healable, Cloneable):
     range: int
     heal_percent: int
@@ -25,12 +24,12 @@ class Archer(Unit, Ability, Healable, Cloneable):
         self.heal_percent = heal_percent
         self.ranged_damage = ranged_damage
 
-    def ability(self):
-        pass
+    def ability(self, unit: Unit):
+        unit.set_hp(unit.hp - self.ranged_damage)
+
 
     def heal(self) -> int:
         healed = int(self.hp / 100 * self.heal_percent)
-        self.hp += healed
         return healed
 
     def clone(self) -> Unit:

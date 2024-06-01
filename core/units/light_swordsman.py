@@ -3,7 +3,6 @@ from core.units.interfaces import Unit, Healable, Cloneable
 from misc.lazy import lazy
 
 
-@lazy
 class LightSwordsman(Unit, Healable, Cloneable):
     heal_percent: int
 
