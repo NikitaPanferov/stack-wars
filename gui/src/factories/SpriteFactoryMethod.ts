@@ -40,6 +40,8 @@ class SpriteFactoryMethod {
         return factory.createPaladin();
       case "wizard":
         return factory.createWizard();
+      case "walk_town":
+        return factory.createWalkTown();
       default:
         throw new Error("Invalid unit type");
     }

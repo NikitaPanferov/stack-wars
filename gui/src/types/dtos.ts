@@ -10,8 +10,8 @@ export enum ActionType {
 
 export type Action = {
   type: ActionType;
-  object: number;
-  subject: number;
+  object: string;
+  subject: string;
   value: number;
 };
 

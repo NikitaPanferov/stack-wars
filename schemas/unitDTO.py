@@ -3,7 +3,7 @@ from enum import Enum
 from pydantic import BaseModel
 
 from conf.config import Unit as ConfigUnit
-from core.units import Archer, HeavySwordsman, LightSwordsman, Paladin, Wizard
+from core.units import Archer, HeavySwordsman, LightSwordsman, Paladin, Wizard, WalkTownAdapter
 from core.units.interfaces import Unit
 
 
@@ -13,6 +13,7 @@ class UnitType(str, Enum):
     light_swordsman = 'light_swordsman'
     paladin = 'paladin'
     wizard = 'wizard'
+    walk_town = 'walk_town'
 
 
 ClassName_UnitType = {
@@ -21,6 +22,7 @@ ClassName_UnitType = {
             LightSwordsman.__name__: UnitType.light_swordsman,
             Wizard.__name__: UnitType.wizard,
             Paladin.__name__: UnitType.paladin,
+            WalkTownAdapter.__name__: UnitType.walk_town
         }
 
 

@@ -15,6 +15,7 @@ export type ForcesConfig = {
         light_swordsman: UnitConfig;
         paladin: UnitConfig;
         wizard: UnitConfig;
+        walk_town: UnitConfig;
     };
     horde: {
         archer: UnitConfig;
@@ -22,6 +23,7 @@ export type ForcesConfig = {
         light_swordsman: UnitConfig;
         paladin: UnitConfig;
         wizard: UnitConfig;
+        walk_town: UnitConfig;
     };
 };
 

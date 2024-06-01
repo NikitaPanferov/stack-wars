@@ -14,6 +14,7 @@ export abstract class AbstractSpriteFactory {
   abstract createLightSwordsman(): UnitSprite;
   abstract createPaladin(): UnitSprite;
   abstract createWizard(): UnitSprite;
+  abstract createWalkTown(): UnitSprite;
 }
 
 export class AllianceSpriteFactory extends AbstractSpriteFactory {
@@ -65,6 +66,16 @@ export class AllianceSpriteFactory extends AbstractSpriteFactory {
       offsetX: 10,
     };
   }
+  createWalkTown() {
+      return {
+        image: "sprites/alliance/walk_town.png",
+        width: 128,
+        height: 128,
+        steps: 11,
+        fps: 30,
+        offsetX: 0,
+      }
+  }
 }
 
 export class HordeSpriteFactory extends AbstractSpriteFactory {
@@ -113,4 +124,14 @@ export class HordeSpriteFactory extends AbstractSpriteFactory {
       fps: 6,
     };
   }
+  createWalkTown() {
+    return {
+      image: "sprites/horde/walk_town.png",
+      width: 128,
+      height: 128,
+      steps: 11,
+      fps: 30,
+      offsetX: 0,
+    }
+}
 }

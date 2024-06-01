@@ -46,6 +46,9 @@ class Paladin(Unit, HealPercentMixin, RangeMixin, BaseModel):
 class Wizard(Unit, RangeMixin, HealPercentMixin, BaseModel):
     pass
 
+class WalkTown(Unit, BaseModel):
+    pass
+
 
 class Army(BaseModel):
     archer: Archer
@@ -53,6 +56,7 @@ class Army(BaseModel):
     light_swordsman: LightSwordsman
     paladin: Paladin
     wizard: Wizard
+    walk_town: WalkTown
 
 
 class Forces(BaseModel):

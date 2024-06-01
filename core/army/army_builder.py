@@ -32,6 +32,9 @@ class ArmyBuilder:
     def add_wizard(self) -> ArmyBuilder:
         self.units.append(self.factory.wizard())
         return self
+    
+    def add_walk_town(self) -> ArmyBuilder:
+        self.units.append(self.factory.walk_town())
 
     def build(self) -> List[List[Unit]]:
         units = [*self.units]

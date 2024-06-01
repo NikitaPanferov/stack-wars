@@ -27,6 +27,8 @@ class Army:
                     self.army_builder.add_paladin()
                 case "wizard":
                     self.army_builder.add_wizard()
+                case "walk_town":
+                    self.army_builder.add_walk_town()
 
         self.units = self.army_builder.build()
 
