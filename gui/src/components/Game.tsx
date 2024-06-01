@@ -10,6 +10,7 @@ import {
   Strategy,
   Unit,
   ActionType,
+  GameStatus,
 } from "../types";
 import { spriteFactory } from "../factories";
 import { Tooltip, Card } from "antd";
@@ -45,9 +46,15 @@ const renderUnit = (
   const colorIntensity = Math.round((hpPercentage / 100) * 255);
   const color = `rgb(255, ${colorIntensity}, ${colorIntensity})`;
 
-  const isAttacking = unit.type !== "walk_town" && actionState && actionState[unit.id] === "attacking";
+  const isAttacking =
+    unit.type !== "walk_town" &&
+    actionState &&
+    actionState[unit.id] === "attacking";
   const isAttacked = actionState && actionState[unit.id] === "attacked";
-  const isDodged = unit.type !== "walk_town" && actionState && actionState[unit.id] === "dodged";
+  const isDodged =
+    unit.type !== "walk_town" &&
+    actionState &&
+    actionState[unit.id] === "dodged";
   const isDead = actionState && actionState[unit.id] === "dead";
   const isArrow = actionState && actionState[unit.id] === "arrow";
   const isCloned = actionState && actionState[unit.id] === "cloned";
@@ -165,7 +172,7 @@ const renderArmyRow = (
           unit,
           maxHeight,
           springProps,
-            config,
+          config,
           spacing,
           actionState
         );
@@ -203,17 +210,21 @@ const renderArmy = (
 export type GameProps = {
   alliance: Army;
   horde: Army;
+  config: Config;
   setAlliance: React.Dispatch<React.SetStateAction<Army>>;
   setHorde: React.Dispatch<React.SetStateAction<Army>>;
-  config: Config;
+  setGameStatus: React.Dispatch<React.SetStateAction<GameStatus>>;
+  setWinner: React.Dispatch<React.SetStateAction<string | null>>;
 };
 
 export const Game: React.FC<GameProps> = ({
   alliance,
   horde,
+  config,
   setAlliance,
   setHorde,
-  config,
+  setGameStatus,
+  setWinner,
 }) => {
   const [width, setWidth] = useState(0);
   const divRef = useRef(null);
@@ -268,6 +279,9 @@ export const Game: React.FC<GameProps> = ({
         newActionState[action.subject] = "cloned";
       } else if (action.type === ActionType.heal) {
         newActionState[action.subject] = "healed";
+      } else if (action.type === ActionType.win) {
+        setGameStatus(GameStatus.results);
+        setWinner(action.object);
       }
       setActionState(newActionState);
 
@@ -275,9 +289,7 @@ export const Game: React.FC<GameProps> = ({
         setActionState({});
         if (action.type === ActionType.death) {
           setAlliance((prev) =>
-            prev.map((row) =>
-              row.filter((unit) => unit.id !== action.subject)
-            )
+            prev.map((row) => row.filter((unit) => unit.id !== action.subject))
           );
           setHorde((prev) =>
             prev.map((row) => row.filter((unit) => unit.id !== action.subject))

@@ -6,6 +6,7 @@ export enum ActionType {
   clone = "clone",
   heal = "heal",
   move = "move",
+  win = "win",
 }
 
 export type Action = {

@@ -50,7 +50,7 @@ export const AppLayout: React.FC<{ children: React.ReactNode }> = ({
       <Content style={{ padding: "30px 40px" }}>{children}</Content>
       <Footer style={{ textAlign: "center" }}>
         <a
-          href="https://github.com/your-repo"
+          href="https://github.com/NikitaPanferov/stack-wars"
           target="_blank"
           rel="noopener noreferrer"
         >

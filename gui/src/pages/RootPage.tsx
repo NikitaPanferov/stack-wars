@@ -7,13 +7,17 @@ import { ArmySelection, Game, GameResult } from "../components";
 
 export const RootPage = () => {
   const [selectedAlliance, setSelectedAlliance] = useState<string[]>([]);
+
   const [selectedHorde, setSelectedHorde] = useState<string[]>([]);
+  console.log({ selectedAlliance, selectedHorde });
   const [gameStatus, setGameStatus] = useState<GameStatus>(GameStatus.off);
 
   const [alliance, setAlliance] = useState<Army>({} as Army);
   const [horde, setHorde] = useState<Army>({} as Army);
 
   const [config, setConfig] = useState<Config>();
+
+  const [winner, setWinner] = useState<string | null>(null);
 
   const { data, error, isLoading } = useQuery<Config>("config", fetchConfig, {
     onSuccess: (config) => {
@@ -23,7 +27,7 @@ export const RootPage = () => {
   const mutation = useMutation(
     () => startGame(selectedAlliance, selectedHorde),
     {
-      onSuccess: ({ data: {game_state} }) => {
+      onSuccess: ({ data: { game_state } }) => {
         setGameStatus(GameStatus.game);
         setAlliance(game_state.alliance);
         setHorde(game_state.horde);
@@ -85,14 +89,21 @@ export const RootPage = () => {
           horde={horde}
           setAlliance={setAlliance}
           setHorde={setHorde}
+          setGameStatus={setGameStatus}
+          setWinner={setWinner}
           config={config}
         />
       )
     );
   }
 
-  if (gameStatus === GameStatus.results) {
-    return <GameResult />;
+  if (gameStatus === GameStatus.results && !!winner) {
+    return (
+      <GameResult
+        winner={winner}
+        setGameStatus={setGameStatus}
+      />
+    );
   }
 
   return null;
