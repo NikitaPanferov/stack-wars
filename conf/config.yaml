@@ -1,10 +1,10 @@
 forces:
     alliance:
         archer:
-            hp: 100
-            damage: 30
+            hp: 50
+            damage: 60
             defence: 20
-            dodge: 15
+            dodge: 1
             cost: 25
             range: 50
             heal_percent: 5
@@ -41,10 +41,10 @@ forces:
             heal_percent: 12
     horde:
         archer:
-            hp: 90
-            damage: 35
+            hp: 50
+            damage: 60
             defence: 18
-            dodge: 12
+            dodge: 2
             cost: 22
             range: 45
             heal_percent: 6

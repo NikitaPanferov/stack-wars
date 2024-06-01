@@ -1,4 +1,5 @@
 from __future__ import annotations
+import random
 from typing import List, Tuple
 
 
@@ -38,3 +39,14 @@ class Army:
 
     def add_unit(self, unit, i, j) -> None:
         self.units[i].insert(j, unit)
+
+    def get_target_in_range(self, i: int, j: int, range: int) -> Unit:
+        upper_a = min(range, len(self.units) - i)
+        lower_a = -min(range, i)
+        a = random.randint(lower_a, upper_a)
+
+        upper_b = min(range - abs(a), len(self.units[i]) - j)
+        lower_b = -min(range - abs(a), j)
+        b = random.randint(lower_b, upper_b)
+
+        return self.units[i + a][j + b]

@@ -38,7 +38,7 @@ class Unit(ABC):
         return self.damage
 
     def take_damage(self, damage: int) -> int:
-        if random.random() * 100 >= self.dodge:
+        if random.random() * 100 <= self.dodge:
             return 0
         defenced_damage = damage - self.defence
         self.hp -= defenced_damage

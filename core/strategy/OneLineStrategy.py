@@ -1,10 +1,12 @@
+from typing import Tuple
+
 from core.army.army import Army
 from core.strategy.AbcStrategy import AbcStrategy
 
 
 class OneLineStrategy(AbcStrategy):
-    def handle_death(self, dead_i: int, dead_j: int, army: Army) -> (int, int):
-        pass
+    def handle_death(self, dead_i: int, dead_j: int, army: Army) -> Tuple[int, int]:
+        return -1, -1
 
     def handle_undo(self, from_i: int, from_j:int, to_i: int, to_j: int, army: Army):
         pass
