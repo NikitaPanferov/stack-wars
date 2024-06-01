@@ -6,7 +6,11 @@ class MultiLineStrategy(AbcStrategy):
     def handle_death(self, dead_i: int, dead_j: int, army: Army) -> (int, int):
         for i in range(1, len(army.units)):
             if len(army.units[dead_i - i]) > 1:
-                army.units[dead_i][dead_j] = army.units[dead_i - i].pop(len(army.units[dead_i - i]) - 1)
+                unit = army.units[dead_i - i].pop(len(army.units[dead_i - i]) - 1)
+                if len(army.units[dead_i]) == 0:
+                    army.units[dead_i].append(unit)
+                else:
+                    army.units[dead_i][dead_j] = army.units[dead_i - i].pop(len(army.units[dead_i - i]) - 1)
                 return dead_i - i, len(army.units[dead_i - i])
 
         army.units.pop(dead_i)

@@ -5,11 +5,17 @@ from core.commands.command import Command
 
 class CommandManager:
     def __init__(self):
-        self._history: List[List[Command]] = [[]]
-        self._current_step = 0
+        self._history: List[List[Command]] = []
+        self._current_step = -1
 
     def _get_last_step(self) -> List[Command]:
         return self._history[self._current_step]
+
+    def new_step(self):
+        if self._current_step != len(self._history) - 1:
+            self._history = self._history[:self._current_step + 1]
+        self._history.append([])
+        self._current_step += 1
 
     def execute(self, command: Command, new: bool = False):
         if new:

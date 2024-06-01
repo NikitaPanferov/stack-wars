@@ -24,4 +24,4 @@ class LightSwordsman(Unit, Healable, Cloneable):
         return healed
 
     def clone(self) -> Unit:
-        return LightSwordsman(self.hp, self.damage, self.defence, self.dodge, self.cost)
+        return LightSwordsman(self)

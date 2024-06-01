@@ -1,4 +1,4 @@
-from typing import AsyncGenerator, List
+from typing import AsyncGenerator
 
 from core.army.army import Army
 from core.army.army_builder import ArmyBuilder
@@ -7,6 +7,7 @@ from core.commands.actions.action_builder import ActionBuilder
 from core.commands.commands.arrow import Arrow
 from core.commands.commands.clone import Clone
 from core.commands.commands.heal import Heal
+from core.commands.commands.strategy import Strategy
 from core.commands.manager import CommandManager
 from core.commands.commands import Attack, Death
 
@@ -19,11 +20,8 @@ from core.units.interfaces.unit import Unit
 from core.units.paladin import Paladin
 from core.units.wizard import Wizard
 from misc.singleton import SingletonMeta
-from schemas import InitArmiesDTO, Action, ActionType, NextStepDTO, GameStateDTO
+from schemas import InitArmiesDTO, NextStepDTO, GameStateDTO
 from schemas.strategy_type import StrategyType
-from schemas.unitDTO import ClassName_UnitType
-
-from misc import total_count
 
 from misc import total_count
 
@@ -67,8 +65,8 @@ class GameManager(metaclass=SingletonMeta):
         while (
             len(self.alliance.units) >= i + 1
             and len(self.horde.units) >= i + 1
-            and self.alliance.units[i][0]
-            and self.horde.units[i][0]
+            and len(self.alliance.units[i]) != 0
+            and len(self.horde.units[i]) != 0
         ):
             alliance_unit = self.alliance.units[i][0]
             horde_unit = self.horde.units[i][0]
@@ -89,7 +87,7 @@ class GameManager(metaclass=SingletonMeta):
                 self.command_manager.execute(death_command)
                 self.action_builder.death(alliance_unit.id, horde_unit.id, 1)
 
-                if self.horde.units[i]:
+                if self.horde.units and len(self.horde.units) > i and len(self.horde.units[i]):
                     horde_unit = self.horde.units[i][0]
                 else:
                     i += 1
@@ -136,7 +134,6 @@ class GameManager(metaclass=SingletonMeta):
             self.command_manager.execute(death_command)
             self.action_builder.death(unit.id, target.id, 1)
 
-
     def __process_clone(self, unit: Wizard, army: Army):
         target = army.get_unit_target_in_range(unit)
         if not isinstance(target, Cloneable):
@@ -149,6 +146,10 @@ class GameManager(metaclass=SingletonMeta):
     def __process_ability(self, unit: Unit, army_from: Army, army_to: Army):
         if not isinstance(unit, Ability):
             return
+        if self.used_units.get(unit.id, False):
+            return
+        self.used_units[unit.id] = True
+
         if isinstance(unit, Archer):
             self.__process_archer(unit, army_from, army_to)
         if isinstance(unit, Wizard):
@@ -157,7 +158,10 @@ class GameManager(metaclass=SingletonMeta):
             self.__process_heal(unit, army_from)
 
     def next_step(self) -> NextStepDTO:
+        self.command_manager.new_step()
         self.__battle_of_firsts()
+
+        self.used_units = {}
 
         is_alliance_not_end = is_horde_not_end = True
         alliance_iter = iter(self.alliance)
@@ -199,11 +203,25 @@ class GameManager(metaclass=SingletonMeta):
             actions=self.action_builder.build(), game_state=self.__get_game_state()
         )
 
+    # def change_strategy(self, strategy: StrategyType) -> GameStateDTO:
+    #     self.strategy = strategies[strategy]
+    #     print(self.alliance.units, self.horde.units, "\n\n\n\n")
+    #     self.strategy.rebuild_armies(alliance=self.alliance, horde=self.horde)
+    #     print(self.alliance.units, self.horde.units)
+    #     return self.__get_game_state()
+
     def change_strategy(self, strategy: StrategyType) -> GameStateDTO:
-        self.strategy = strategies[strategy]
-        print(self.alliance.units, self.horde.units, "\n\n\n\n")
-        self.strategy.rebuild_armies(alliance=self.alliance, horde=self.horde)
-        print(self.alliance.units, self.horde.units)
+        self.command_manager.new_step()
+        change_strategy_command = Strategy(strategies[strategy], self)
+        self.command_manager.execute(change_strategy_command)
+        return self.__get_game_state()
+
+    def undo(self) -> GameStateDTO:
+        self.command_manager.undo()
+        return self.__get_game_state()
+
+    def redo(self) -> GameStateDTO:
+        self.command_manager.redo()
         return self.__get_game_state()
 
 

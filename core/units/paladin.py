@@ -30,4 +30,4 @@ class Paladin(Unit, Ability, Cloneable, Healable):
         return healed
 
     def clone(self) -> Unit:
-        return Paladin(self.range, self.hp, self.damage, self.defence, self.dodge, self.cost)
+        return Paladin(self)

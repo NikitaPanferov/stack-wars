@@ -255,6 +255,7 @@ export const Game: React.FC<GameProps> = ({
 
   useEffect(() => {
     if (
+        actions &&
       actions.length > 0 &&
       currentActionIndex !== -1 &&
       currentActionIndex < actions.length

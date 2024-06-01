@@ -27,49 +27,13 @@ async def next_step(gm: Annotated[GameManager, Depends(game_manager)]) -> NextSt
 
 
 @router.get("/undo")
-async def undo() -> GameState:
-    return GameState(
-        alliance=[
-            [
-                UnitDTO(
-                    id=i,
-                    type=UnitType.archer,
-                    **Settings().forces.alliance.archer.dict()
-                )
-                for i in range(5)
-            ]
-        ],
-        horde=[
-            [
-                UnitDTO(
-                    id=i, type=UnitType.archer, **Settings().forces.horde.archer.dict()
-                )
-                for i in range(5, 10)
-            ]
-        ],
-    )
+async def undo(gm: Annotated[GameManager, Depends(game_manager)]) -> GameState:
+    return GameState(game_state=gm.undo())
 
 
 @router.get("/redo")
-async def redo() -> GameState:
-    return GameState(
-        alliance=[
-            [
-                UnitDTO(
-                    id=0,
-                    type=UnitType.archer,
-                    **Settings().forces.alliance.archer.dict()
-                )
-            ]
-        ],
-        horde=[
-            [
-                UnitDTO(
-                    id=1, type=UnitType.archer, **Settings().forces.horde.archer.dict()
-                )
-            ]
-        ],
-    )
+async def redo(gm: Annotated[GameManager, Depends(game_manager)]) -> GameState:
+    return GameState(game_state=gm.redo())
 
 
 @router.get("/change_strategy")

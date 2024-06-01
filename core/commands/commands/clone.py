@@ -10,8 +10,6 @@ class Clone(Command):
         self.army = army
         self.target = target
         self.i, self.j = self.army.find_unit(self.unit)
-        self.target
-
 
     def do(self):
         self.army.add_unit(self.target.clone(), self.i, self.j)

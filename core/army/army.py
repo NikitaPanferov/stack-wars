@@ -44,18 +44,17 @@ class Army:
         self.units[i].pop(j)
         return i, j
 
-
     def add_unit(self, unit, i, j) -> None:
         self.units[i].insert(j, unit)
 
     def get_target_in_range(self, i: int, j: int, range: int) -> Unit:
-        upper_a = min(range, len(self.units) - i)
+        upper_a = min(range, len(self.units) - 1 - i)
         lower_a = -min(range, i)
-        a = random.randint(lower_a, upper_a)
+        a = random.randint(lower_a, upper_a) if lower_a != upper_a + 1 else lower_a
 
-        upper_b = min(range - abs(a), len(self.units[i]) - j)
+        upper_b = min(range - abs(a), len(self.units[i]) - 1 - j)
         lower_b = -min(range - abs(a), j)
-        b = random.randint(lower_b, upper_b)
+        b = random.randint(lower_b, upper_b) if lower_b != upper_b + 1 else lower_b
 
         return self.units[i + a][j + b]
 
@@ -68,7 +67,7 @@ class Army:
 
     def __iter(self):
         j = 1
-        while max([len(arr) for arr in self.units]) >= j + 1:
+        while len(self.units) and max([len(arr) for arr in self.units]) >= j + 1:
             i = 0
             while len(self.units) >= i + 1:
                 if len(self.units[i]) >= j + 1:
