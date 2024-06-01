@@ -15,11 +15,12 @@ class Archer(Unit, Ability, Healable, Cloneable):
         if unit:
             self.range = unit.range
             self.heal_percent = unit.heal_percent
-            self.ranged_damage: unit.ranged_damage
+            self.ranged_damage = unit.ranged_damage
         else:
             self._init_stats(*args, **kwargs)
 
     def _init_stats(self, range: int, heal_percent: int, ranged_damage: int, *args, **kwargs):
+        super()._init_stats(*args, **kwargs)  # Initialize base class attributes
         self.range = range
         self.heal_percent = heal_percent
         self.ranged_damage = ranged_damage

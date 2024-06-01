@@ -17,6 +17,7 @@ class Wizard(Unit, Healable, Ability):
             self._init_stats(*args, **kwargs)
 
     def _init_stats(self, range: int, heal_percent: int, *args, **kwargs):
+        super()._init_stats(*args, **kwargs)
         self.range = range
         self.heal_percent = heal_percent
 

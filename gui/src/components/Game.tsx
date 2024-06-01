@@ -56,16 +56,19 @@ const renderUnit = (
     actionState &&
     actionState[unit.id] === "dodged";
   const isDead = actionState && actionState[unit.id] === "dead";
-  const isArrow = actionState && actionState[unit.id] === "arrow";
-  const isCloned = actionState && actionState[unit.id] === "cloned";
-  const isHealed = actionState && actionState[unit.id] === "healed";
+  const isArrowFrom = actionState && actionState[unit.id] === "arrowFrom";
+  const isArrowTo = actionState && actionState[unit.id] === "arrowTo";
+  const isClonedFrom = actionState && actionState[unit.id] === "clonedFrom";
+  const isClonedTo = actionState && actionState[unit.id] === "clonedTo";
+  const isHealedFrom = actionState && actionState[unit.id] === "healedFrom";
+  const isHealedTo = actionState && actionState[unit.id] === "healedTo";
 
   let transformMove = "none";
   if (isAttacking) {
     transformMove =
       armyType === "alliance" ? "rotate(15deg)" : "rotate(-15deg)";
   }
-  if (isAttacked) {
+  if (isAttacked || isArrowTo) {
     transformMove = "scale(1.2)";
   }
   if (isDodged) {
@@ -74,14 +77,8 @@ const renderUnit = (
   if (isDead) {
     transformMove = "scale(0.01)";
   }
-  if (isArrow) {
-    transformMove = "translateX(10px)";
-  }
-  if (isCloned) {
-    transformMove = "scale(1.5)";
-  }
-  if (isHealed) {
-    transformMove = "scale(1.1)";
+  if (isArrowFrom || isClonedFrom || isHealedFrom) {
+    transformMove = "translateY(-10px)";
   }
 
   return (
@@ -111,7 +108,7 @@ const renderUnit = (
             transform: armyType === "horde" ? "scaleX(-1)" : "none",
             position: "absolute",
             left: offsetX || 0,
-            filter: `drop-shadow(0 0 10px ${color})`,
+            filter: isHealedTo ? `drop-shadow(0 0 10px rgb(0, 255, 0))` : isClonedTo ? `drop-shadow(0 0 10px rgb(0, 0, 255))` : isClonedTo ? `drop-shadow(0 0 10px rgb(255, 255, 0))` : `drop-shadow(0 0 10px ${color})`,
           }}
           className={`spritesheet-${armyType}-${unit}`}
           image={image}
@@ -274,11 +271,14 @@ export const Game: React.FC<GameProps> = ({
       } else if (action.type === ActionType.death) {
         newActionState[action.subject] = "dead";
       } else if (action.type === ActionType.arrow) {
-        newActionState[action.subject] = "arrow";
+        newActionState[action.object] = "arrowFrom"
+        newActionState[action.subject] = "arrowTo";
       } else if (action.type === ActionType.clone) {
-        newActionState[action.subject] = "cloned";
+        newActionState[action.object] = "clonedFrom";
+        newActionState[action.subject] = "clonedTo";
       } else if (action.type === ActionType.heal) {
-        newActionState[action.subject] = "healed";
+        newActionState[action.object] = "healedFrom";
+        newActionState[action.subject] = "healedTo";
       } else if (action.type === ActionType.win) {
         setGameStatus(GameStatus.results);
         setWinner(action.object);

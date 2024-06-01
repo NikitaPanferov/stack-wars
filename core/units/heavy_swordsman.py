@@ -15,6 +15,7 @@ class HeavySwordsman(Unit, Healable):
             self._init_stats(*args, **kwargs)
 
     def _init_stats(self, heal_percent: int, *args, **kwargs):
+        super()._init_stats(*args, **kwargs)
         self.heal_percent = heal_percent
 
     def heal(self) -> int:

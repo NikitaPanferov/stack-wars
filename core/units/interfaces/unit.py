@@ -14,7 +14,7 @@ class Unit(ABC):
     dodge: int
     cost: int
 
-    def __init__(self, unit: Optional[Unit], *args, **kwargs):
+    def __init__(self, unit: Optional[Unit] = None, *args, **kwargs):
         self.id = uuid4().hex
         if unit:
             self.hp = unit.hp
