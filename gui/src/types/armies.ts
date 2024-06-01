@@ -3,7 +3,8 @@ export type UnitType =
   | "heavy_swordsman"
   | "light_swordsman"
   | "paladin"
-  | "wizard";
+  | "wizard"
+  | "walk_town";
 export type ArmyType = "alliance" | "horde";
 export type Strategy = "one_line" | "multi_line" | "wall_to_wall";
 

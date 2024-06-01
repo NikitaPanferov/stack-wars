@@ -45,9 +45,9 @@ const renderUnit = (
   const colorIntensity = Math.round((hpPercentage / 100) * 255);
   const color = `rgb(255, ${colorIntensity}, ${colorIntensity})`;
 
-  const isAttacking = actionState && actionState[unit.id] === "attacking";
+  const isAttacking = unit.type !== "walk_town" && actionState && actionState[unit.id] === "attacking";
   const isAttacked = actionState && actionState[unit.id] === "attacked";
-  const isDodged = actionState && actionState[unit.id] === "dodged";
+  const isDodged = unit.type !== "walk_town" && actionState && actionState[unit.id] === "dodged";
   const isDead = actionState && actionState[unit.id] === "dead";
   const isArrow = actionState && actionState[unit.id] === "arrow";
   const isCloned = actionState && actionState[unit.id] === "cloned";
