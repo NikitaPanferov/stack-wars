@@ -10,6 +10,7 @@ class ActionType(str, Enum):
     clone = 'clone'
     heal = 'heal'
     move = 'move'
+    win = 'win'
 
 
 class Action(BaseModel):

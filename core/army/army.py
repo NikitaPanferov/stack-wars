@@ -5,6 +5,7 @@ from typing import List, Tuple
 
 from core.army.army_builder import ArmyBuilder
 from core.units.interfaces import Unit
+from core.units.interfaces.ability import Ability
 from schemas.unitDTO import UnitType
 
 
@@ -29,13 +30,18 @@ class Army:
 
         self.units = self.army_builder.build()
 
-    def delete_unit(self, unit_in: Unit) -> Tuple[int, int]:
+    def find_unit(self, unit: Unit) -> Tuple[int, int]:
         for i, first_list in enumerate(self.units):
             for j, unit in enumerate(first_list):
-                if unit.id == unit_in.id:
-                    self.units[i].pop(j)
+                if unit.id == unit.id:
                     return i, j
         raise ValueError("user not found")
+
+    def delete_unit(self, unit_in: Unit) -> Tuple[int, int]:
+        i, j = self.find_unit(unit_in)
+        self.units[i].pop(j)
+        return i, j
+
 
     def add_unit(self, unit, i, j) -> None:
         self.units[i].insert(j, unit)
@@ -50,3 +56,20 @@ class Army:
         b = random.randint(lower_b, upper_b)
 
         return self.units[i + a][j + b]
+
+    def get_unit_target_in_range(self, unit: Ability) -> Unit:
+        i, j = self.find_unit(unit)
+        return self.get_target_in_range(i, j, unit.range)
+
+    def __iter__(self):
+        return self.__iter()
+
+    def __iter(self):
+        j = 1
+        while max([len(arr) for arr in self.units]) >= j + 1:
+            i = 0
+            while len(self.units) >= i + 1:
+                if len(self.units[i]) >= j + 1:
+                    yield self.units[i][j]
+                i += 1
+            j += 1

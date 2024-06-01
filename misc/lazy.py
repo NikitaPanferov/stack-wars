@@ -18,5 +18,6 @@ def lazy(cls):
 
     LazyClass.__name__ = cls.__name__
     LazyClass.__module__ = cls.__module__
+    LazyClass.__qualname__ = cls.__qualname__
 
     return LazyClass

@@ -2,6 +2,7 @@ from __future__ import annotations  # для правильной работы �
 
 import random
 from abc import ABC
+from typing import Optional
 from uuid import uuid4
 
 
@@ -13,7 +14,7 @@ class Unit(ABC):
     dodge: int
     cost: int
 
-    def __init__(self, unit=None, *args, **kwargs):
+    def __init__(self, unit: Optional[Unit], *args, **kwargs):
         self.id = uuid4().hex
         if unit:
             self.hp = unit.hp
@@ -41,5 +42,4 @@ class Unit(ABC):
         if random.random() * 100 <= self.dodge:
             return 0
         defenced_damage = damage - self.defence
-        self.hp -= defenced_damage
         return defenced_damage
