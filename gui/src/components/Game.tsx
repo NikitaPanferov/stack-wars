@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState, useMemo } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useSpring, animated, SpringValue } from "react-spring";
 import Spritesheet from "react-responsive-spritesheet";
 import {
@@ -9,6 +9,7 @@ import {
   GameState,
   Strategy,
   Unit,
+  ActionType,
 } from "../types";
 import { spriteFactory } from "../factories";
 import { Tooltip, Card } from "antd";
@@ -28,7 +29,7 @@ const renderUnit = (
   },
   config: Config,
   spacing?: number,
-  attackState?: { [key: string]: string }
+  actionState?: { [key: string]: string }
 ) => {
   const { image, width, height, steps, fps, offsetX, offsetY } =
     spriteFactory.createSprite(armyType, unit.type);
@@ -44,9 +45,13 @@ const renderUnit = (
   const colorIntensity = Math.round((hpPercentage / 100) * 255);
   const color = `rgb(255, ${colorIntensity}, ${colorIntensity})`;
 
-  const isAttacking = attackState && attackState[unit.id] === "attacking";
-  const isAttacked = attackState && attackState[unit.id] === "attacked";
-  const isDodged = attackState && attackState[unit.id] === "dodged";
+  const isAttacking = actionState && actionState[unit.id] === "attacking";
+  const isAttacked = actionState && actionState[unit.id] === "attacked";
+  const isDodged = actionState && actionState[unit.id] === "dodged";
+  const isDead = actionState && actionState[unit.id] === "dead";
+  const isArrow = actionState && actionState[unit.id] === "arrow";
+  const isCloned = actionState && actionState[unit.id] === "cloned";
+  const isHealed = actionState && actionState[unit.id] === "healed";
 
   let transformMove = "none";
   if (isAttacking) {
@@ -59,9 +64,21 @@ const renderUnit = (
   if (isDodged) {
     transformMove = "translate(0, 10px)";
   }
+  if (isDead) {
+    transformMove = "scale(0.01)";
+  }
+  if (isArrow) {
+    transformMove = "translateX(10px)";
+  }
+  if (isCloned) {
+    transformMove = "scale(1.5)";
+  }
+  if (isHealed) {
+    transformMove = "scale(1.1)";
+  }
 
   return (
-    <Tooltip title={unit.type} key={unit.id}>
+    <Tooltip title={unit.id} key={unit.id}>
       <div
         style={{
           width: width,
@@ -113,7 +130,7 @@ const renderArmyRow = (
     opacity?: SpringValue<number>;
   },
   config: Config,
-  attackState?: { [key: string]: string }
+  actionState?: { [key: string]: string }
 ) => {
   const totalRowUnitWidth = row.length * 128;
   let spacing = (containerWidth - totalRowUnitWidth) / (row.length - 1);
@@ -132,28 +149,26 @@ const renderArmyRow = (
       }}
     >
       {row.map((unit, i) => {
-        return useMemo(() => {
-          if (i === 0) {
-            return renderUnit(
-              armyType,
-              unit,
-              maxHeight,
-              springProps,
-              config,
-              -20,
-              attackState
-            );
-          }
+        if (i === 0) {
           return renderUnit(
             armyType,
             unit,
             maxHeight,
             springProps,
             config,
-            spacing,
-            attackState
+            -20,
+            actionState
           );
-        }, [unit, attackState]);
+        }
+        return renderUnit(
+          armyType,
+          unit,
+          maxHeight,
+          springProps,
+            config,
+          spacing,
+          actionState
+        );
       })}
     </div>
   );
@@ -167,7 +182,7 @@ const renderArmy = (
     opacity?: SpringValue<number>;
   },
   config: Config,
-  attackState?: { [key: string]: string }
+  actionState?: { [key: string]: string }
 ) => {
   const maxHeight = 128;
 
@@ -180,7 +195,7 @@ const renderArmy = (
       maxHeight,
       springProps,
       config,
-      attackState
+      actionState
     )
   );
 };
@@ -204,8 +219,11 @@ export const Game: React.FC<GameProps> = ({
   const divRef = useRef(null);
 
   const [actions, setActions] = useState<Action[]>([]);
-  const [attackState, setAttackState] = useState<{ [key: string]: string }>({});
+  const [actionState, setActionState] = useState<{ [key: string]: string }>({});
   const [currentActionIndex, setCurrentActionIndex] = useState(0);
+  const [pendingGameState, setPendingGameState] = useState<GameState | null>(
+    null
+  );
 
   useEffect(() => {
     const handleResize = (entries: ResizeObserverEntry[]) => {
@@ -234,29 +252,52 @@ export const Game: React.FC<GameProps> = ({
       currentActionIndex < actions.length
     ) {
       const action = actions[currentActionIndex];
-      const newAttackState: { [key: string]: string } = {};
-      if (action.type === "attack") {
-        newAttackState[action.subject] = "attacking";
+      const newActionState: { [key: string]: string } = {};
+      if (action.type === ActionType.attack) {
+        newActionState[action.object] = "attacking";
         if (action.value === 0) {
-          newAttackState[action.object] = "dodged";
+          newActionState[action.subject] = "dodged";
         } else {
-          newAttackState[action.object] = "attacked";
+          newActionState[action.subject] = "attacked";
         }
+      } else if (action.type === ActionType.death) {
+        newActionState[action.subject] = "dead";
+      } else if (action.type === ActionType.arrow) {
+        newActionState[action.subject] = "arrow";
+      } else if (action.type === ActionType.clone) {
+        newActionState[action.subject] = "cloned";
+      } else if (action.type === ActionType.heal) {
+        newActionState[action.subject] = "healed";
       }
-      setAttackState(newAttackState);
+      setActionState(newActionState);
 
-      const attackTimeout = setTimeout(() => {
-        setAttackState({});
+      const actionTimeout = setTimeout(() => {
+        setActionState({});
+        if (action.type === ActionType.death) {
+          setAlliance((prev) =>
+            prev.map((row) =>
+              row.filter((unit) => unit.id !== action.subject)
+            )
+          );
+          setHorde((prev) =>
+            prev.map((row) => row.filter((unit) => unit.id !== action.subject))
+          );
+        }
         const delayTimeout = setTimeout(() => {
           setCurrentActionIndex(currentActionIndex + 1);
-        }, 500); // Задержка между атаками 500 мс
+        }, 500); // Задержка между действиями 500 мс
 
         return () => clearTimeout(delayTimeout);
-      }, 200); // Длительность атаки 200 мс
+      }, 200); // Длительность действия 200 мс
 
-      return () => clearTimeout(attackTimeout);
+      return () => clearTimeout(actionTimeout);
     } else {
-      setAttackState({});
+      setActionState({});
+      if (pendingGameState) {
+        setAlliance(pendingGameState.alliance);
+        setHorde(pendingGameState.horde);
+        setPendingGameState(null);
+      }
       setCurrentActionIndex(-1);
     }
   }, [actions, currentActionIndex]);
@@ -274,7 +315,7 @@ export const Game: React.FC<GameProps> = ({
   const nextStepMutation = useMutation(nextStep, {
     onSuccess: ({ data }) => {
       console.log(data);
-      setGameState(data.game_state);
+      setPendingGameState(data.game_state);
       setActions(data.actions);
       setCurrentActionIndex(0);
     },
@@ -282,14 +323,14 @@ export const Game: React.FC<GameProps> = ({
 
   const undoMutation = useMutation(undo, {
     onSuccess: ({ data }) => {
-      setGameState(data.game_state);
+      setPendingGameState(data.game_state);
       setActions(data.actions);
     },
   });
 
   const redoMutation = useMutation(redo, {
     onSuccess: ({ data }) => {
-      setGameState(data.game_state);
+      setPendingGameState(data.game_state);
       setActions(data.actions);
     },
   });
@@ -318,7 +359,7 @@ export const Game: React.FC<GameProps> = ({
             borderRadius: 20,
             display: "flex",
             justifyContent: "center",
-            alignItems: "center",
+            alignItems: "flex-start",
             padding: "20px",
           }}
         >
@@ -338,7 +379,7 @@ export const Game: React.FC<GameProps> = ({
                 width / 2,
                 springProps,
                 config,
-                attackState
+                actionState
               )}
           </div>
           <div
@@ -357,7 +398,7 @@ export const Game: React.FC<GameProps> = ({
                 width / 2,
                 springProps,
                 config,
-                attackState
+                actionState
               )}
           </div>
         </div>
