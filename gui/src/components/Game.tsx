@@ -51,13 +51,13 @@ const renderUnit = (
   let transformMove = "none";
   if (isAttacking) {
     transformMove =
-      armyType == "alliance" ? "rotate(15deg)" : "rotate(-15deg)";
+      armyType === "alliance" ? "rotate(15deg)" : "rotate(-15deg)";
   }
   if (isAttacked) {
-    transformMove = "scale(1.2)"
+    transformMove = "scale(1.2)";
   }
   if (isDodged) {
-    transformMove = "translate(0, 10px)"
+    transformMove = "translate(0, 10px)";
   }
 
   return (
@@ -103,6 +103,62 @@ const renderUnit = (
   );
 };
 
+const renderArmyRow = (
+  row: Unit[],
+  containerWidth: number,
+  rowIndex: number,
+  armyType: ArmyType,
+  maxHeight: number,
+  springProps: {
+    opacity?: SpringValue<number>;
+  },
+  config: Config,
+  attackState?: { [key: string]: string }
+) => {
+  const totalRowUnitWidth = row.length * 128;
+  let spacing = (containerWidth - totalRowUnitWidth) / (row.length - 1);
+  if (spacing > 0) {
+    spacing = 0;
+  }
+
+  return (
+    <div
+      key={`row-${rowIndex}`}
+      style={{
+        display: "flex",
+        justifyContent: "center",
+        flexDirection: armyType === "alliance" ? "row-reverse" : "row",
+        flexWrap: "nowrap",
+      }}
+    >
+      {row.map((unit, i) => {
+        return useMemo(() => {
+          if (i === 0) {
+            return renderUnit(
+              armyType,
+              unit,
+              maxHeight,
+              springProps,
+              config,
+              -20,
+              attackState
+            );
+          }
+          return renderUnit(
+            armyType,
+            unit,
+            maxHeight,
+            springProps,
+            config,
+            spacing,
+            attackState
+          );
+        }, [unit, attackState]);
+      })}
+    </div>
+  );
+};
+
 const renderArmy = (
   armyType: ArmyType,
   army: Army,
@@ -115,50 +171,18 @@ const renderArmy = (
 ) => {
   const maxHeight = 128;
 
-  return army.map((row, rowIndex) => {
-    const totalRowUnitWidth = row.length * 128;
-    let spacing = (containerWidth - totalRowUnitWidth) / (row.length - 1);
-    if (spacing > 0) {
-      spacing = 0;
-    }
-
-    return (
-      <div
-        key={`row-${rowIndex}`}
-        style={{
-          display: "flex",
-          justifyContent: "center",
-          flexDirection: armyType === "alliance" ? "row-reverse" : "row",
-          flexWrap: "nowrap",
-        }}
-      >
-        {row.map((unit, i) => {
-          return useMemo(() => {
-            if (i === 0) {
-              return renderUnit(
-                armyType,
-                unit,
-                maxHeight,
-                springProps,
-                config,
-                -20,
-                attackState
-              );
-            }
-            return renderUnit(
-              armyType,
-              unit,
-              maxHeight,
-              springProps,
-              config,
-              spacing,
-              attackState
-            );
-          }, [unit, attackState]);
-        })}
-      </div>
-    );
-  });
+  return army.map((row, rowIndex) =>
+    renderArmyRow(
+      row,
+      containerWidth,
+      rowIndex,
+      armyType,
+      maxHeight,
+      springProps,
+      config,
+      attackState
+    )
+  );
 };
 
 export type GameProps = {
@@ -301,7 +325,8 @@ export const Game: React.FC<GameProps> = ({
           <div
             style={{
               width: "50%",
-              display: "flex",
+              display: "grid",
+              gridTemplateRows: `repeat(${alliance.length}, 1fr)`,
               justifyContent: "flex-end",
             }}
           >
@@ -319,7 +344,8 @@ export const Game: React.FC<GameProps> = ({
           <div
             style={{
               width: "50%",
-              display: "flex",
+              display: "grid",
+              gridTemplateRows: `repeat(${horde.length}, 1fr)`,
               justifyContent: "flex-start",
             }}
           >
