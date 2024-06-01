@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from conf.config import Army, Settings
-from core.units import Archer, HeavySwordsman, LightSwordsman, Paladin, Wizard
+from core.units import Archer, HeavySwordsman, LightSwordsman, Paladin, Wizard, WalkTown, WalkTownAdapter
 
 
 class ArmyFactory:
@@ -11,6 +11,7 @@ class ArmyFactory:
         self._light_swordsman = LightSwordsman(**settings.light_swordsman.dict())
         self._paladin = Paladin(**settings.paladin.dict())
         self._wizard = Wizard(**settings.wizard.dict())
+        self._walk_town = WalkTown(settings.walk_town.hp, settings.walk_town.damage, settings.walk_town.defence, settings.walk_town.dodge, settings.walk_town.cost)
 
     def archer(self) -> Archer:
         return Archer(self._archer)
@@ -26,6 +27,9 @@ class ArmyFactory:
 
     def wizard(self) -> Wizard:
         return Wizard(self._wizard)
+    
+    def walk_town(self) -> WalkTown:
+        return WalkTownAdapter(self._walk_town)
 
     @classmethod
     def factory(cls, army_type: str) -> ArmyFactory:

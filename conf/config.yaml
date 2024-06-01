@@ -39,6 +39,12 @@ forces:
             cost: 35
             range: 40
             heal_percent: 12
+        walk_town:
+            hp: 200
+            damage: 0
+            defence: 50
+            dodge: 0
+            cost: 100
     horde:
         archer:
             hp: 50
@@ -79,5 +85,11 @@ forces:
             cost: 38
             range: 45
             heal_percent: 13
+        walk_town:
+            hp: 200
+            damage: 0
+            defence: 50
+            dodge: 0
+            cost: 100
 capital: 500
 line_count: 3
