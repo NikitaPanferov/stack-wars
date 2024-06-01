@@ -23,3 +23,5 @@
 **command** - action manager // history is a two-dimensional array
 
 **strategy** - different types of battle
+
+**iterator** - iterating over the armies
