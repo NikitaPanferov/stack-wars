@@ -54,6 +54,14 @@ class ActionBuilder:
             subject=subject,
             value=value,
         ))
+        
+    def win(self, winner: str, looser: str):
+        self.actions.append(Action(
+            type=ActionType.win,
+            object=winner,
+            subject=looser,
+            value=1
+        ))
 
     def build(self) -> List[Action]:
         actions = [*self.actions]

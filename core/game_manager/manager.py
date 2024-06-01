@@ -12,6 +12,8 @@ from misc.singleton import SingletonMeta
 from schemas import InitArmiesDTO, Action, ActionType, NextStepDTO, GameStateDTO
 from schemas.strategy_type import StrategyType
 
+from misc import total_count
+
 
 class GameManager(metaclass=SingletonMeta):
     def __init__(self):
@@ -28,7 +30,9 @@ class GameManager(metaclass=SingletonMeta):
         self.action_builder: ActionBuilder = ActionBuilder()
 
     def __get_game_state(self) -> GameStateDTO:
-        return GameStateDTO.from_class(alliance=self.alliance.units, horde=self.horde.units)
+        return GameStateDTO.from_class(
+            alliance=self.alliance.units, horde=self.horde.units
+        )
 
     def start_new_game(self, armies: InitArmiesDTO) -> GameStateDTO:
         alliance_factory = ArmyFactory.factory("alliance")
@@ -47,30 +51,50 @@ class GameManager(metaclass=SingletonMeta):
 
     def __battle_of_firsts(self):
         i = 0
-        while len(self.alliance.units) >= i + 1 and len(self.horde.units) >= i + 1:
+        while (
+            len(self.alliance.units) >= i + 1
+            and len(self.horde.units) >= i + 1
+            and self.alliance.units[i][0]
+            and self.horde.units[i][0]
+        ):
             alliance_unit = self.alliance.units[i][0]
             horde_unit = self.horde.units[i][0]
 
             attack_command = Attack(alliance_unit, horde_unit)
             self.command_manager.execute(attack_command)
-            self.action_builder.attack(alliance_unit.id, horde_unit.id, attack_command.taken_damage)
+            self.action_builder.attack(
+                alliance_unit.id, horde_unit.id, attack_command.taken_damage
+            )
 
             if horde_unit.hp <= 0:
-                death_command = Death(horde_unit, self.horde, self.strategy.handle_death, self.strategy.handle_undo)
+                death_command = Death(
+                    horde_unit,
+                    self.horde,
+                    self.strategy.handle_death,
+                    self.strategy.handle_undo,
+                )
                 self.command_manager.execute(death_command)
                 self.action_builder.death(alliance_unit.id, horde_unit.id, 1)
 
-                if len(self.horde.units[i]) > 0:
-                    horde_unit = self.alliance.units[i][0]
+                if self.horde.units[i]:
+                    horde_unit = self.horde.units[i][0]
                 else:
+                    i += 1
                     continue
 
             attack_command = Attack(horde_unit, alliance_unit)
             self.command_manager.execute(attack_command)
-            self.action_builder.attack(horde_unit.id, alliance_unit.id, attack_command.taken_damage)
+            self.action_builder.attack(
+                horde_unit.id, alliance_unit.id, attack_command.taken_damage
+            )
 
             if alliance_unit.hp <= 0:
-                death_command = Death(alliance_unit, self.alliance, self.strategy.handle_death, self.strategy.handle_undo)
+                death_command = Death(
+                    alliance_unit,
+                    self.alliance,
+                    self.strategy.handle_death,
+                    self.strategy.handle_undo,
+                )
                 self.command_manager.execute(death_command)
                 self.action_builder.death(horde_unit.id, alliance_unit.id, 1)
 
@@ -87,7 +111,6 @@ class GameManager(metaclass=SingletonMeta):
 
         #     for row in range(count_rows):
         #     count_units = max(len(self.alliance.units[row]), len(self.horde.units[row]))
-
 
         #     # rows = len(array)
         #     # cols = len(array[0])
@@ -141,14 +164,22 @@ class GameManager(metaclass=SingletonMeta):
         #                 )
         #                 actions.append(action)
 
+        total_count_of_alliance = total_count(self.alliance.units)
+        total_count_of_horde = total_count(self.horde.units)
+        
+        if total_count_of_alliance == 0 or total_count_of_horde == 0:
+            if total_count(self.alliance.units) == 0:
+                self.action_builder.win("horde", "alliance")
+            else:
+                self.action_builder.win("alliance", "horde")
+
         return NextStepDTO(
-            actions=self.action_builder.build(),
-            game_state=self.__get_game_state()
+            actions=self.action_builder.build(), game_state=self.__get_game_state()
         )
 
     def change_strategy(self, strategy: StrategyType) -> GameStateDTO:
         self.strategy = strategies[strategy]
-        print(self.alliance.units, self.horde.units, '\n\n\n\n')
+        print(self.alliance.units, self.horde.units, "\n\n\n\n")
         self.strategy.rebuild_armies(alliance=self.alliance, horde=self.horde)
         print(self.alliance.units, self.horde.units)
         return self.__get_game_state()

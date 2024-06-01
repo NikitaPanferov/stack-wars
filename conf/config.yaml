@@ -10,21 +10,21 @@ forces:
             heal_percent: 5
             ranged_damage: 60
         heavy_swordsman:
-            hp: 150
+            hp: 80
             damage: 50
             defence: 30
             dodge: 5
             cost: 40
             heal_percent: 10
         light_swordsman:
-            hp: 80
+            hp: 60
             damage: 40
             defence: 25
             dodge: 20
             cost: 20
             heal_percent: 7
         paladin:
-            hp: 200
+            hp: 100
             damage: 60
             defence: 40
             dodge: 10
@@ -32,7 +32,7 @@ forces:
             range: 30
             heal_percent: 15
         wizard:
-            hp: 70
+            hp: 40
             damage: 80
             defence: 10
             dodge: 5
@@ -40,7 +40,7 @@ forces:
             range: 40
             heal_percent: 12
         walk_town:
-            hp: 200
+            hp: 100
             damage: 0
             defence: 50
             dodge: 0
@@ -48,7 +48,7 @@ forces:
     horde:
         archer:
             hp: 50
-            damage: 60
+            damage: 50
             defence: 18
             dodge: 2
             cost: 22
@@ -56,8 +56,8 @@ forces:
             heal_percent: 6
             ranged_damage: 70
         heavy_swordsman:
-            hp: 160
-            damage: 55
+            hp: 80
+            damage: 60
             defence: 35
             dodge: 3
             cost: 45
@@ -70,7 +70,7 @@ forces:
             cost: 18
             heal_percent: 9
         paladin:
-            hp: 210
+            hp: 105
             damage: 65
             defence: 45
             dodge: 15
@@ -86,10 +86,10 @@ forces:
             range: 45
             heal_percent: 13
         walk_town:
-            hp: 200
+            hp: 100
             damage: 0
             defence: 50
             dodge: 0
             cost: 100
-capital: 500
+capital: 200
 line_count: 3
